@@ -48,6 +48,8 @@
                         <div id="options_1_selects" class="selects">
                             <select id="options_1_purpose" onchange="updatePurpose()">
                                 <option value="Copy">Copy</option>
+                                <option value="Delete Backups">Delete Backups</option>
+                                <option value="Delete Shadow Copies">Delete Shadow Copies</option>
                                 <option value="Download">Download</option>
                                 <option value="Download & Execute" selected>Download & Execute</option>
                                 <option value="Dump Credentials">Dump Credentials</option>
@@ -67,6 +69,14 @@
                         </div>
                     </div>
                 </div>
+                <div id="desc_1" class="desc">
+                    <div id="desc_1_icon" class="icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                        </svg>                      
+                    </div>
+                    <p id="desc_1_p" class="p"></p>
+                </div>
                 <div id="payload_1" class="payload">
                     <pre id="payload_1_pre">
                         <div id="payload_1_pre_labels" class="labels">
@@ -85,14 +95,6 @@
                             spellcheck="false"
                             onkeyup="update2()"></code>
                     </pre>
-                </div>
-                <div id="desc_1" class="desc">
-                    <div id="desc_1_icon" class="icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
-                        </svg>                      
-                    </div>
-                    <p id="desc_1_p" class="p"></p>
                 </div>
             </div>
 

