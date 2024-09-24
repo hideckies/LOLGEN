@@ -240,11 +240,11 @@ header #title {
 }
 
 @media (max-width: 768px) {
-    #desc {
+    #intro {
         margin: 0 0.8em;
     }
 
-    #desc #desc_inner {
+    #intro #intro_inner {
         width: 100%;
     }
 
