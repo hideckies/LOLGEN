@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "build": "node scripts/minify.js",
+    "dev": "npm run build && python3 -m http.server 8000 -d docs",
+    "serve": "npm run build && python3 -m http.server 8000 -d docs"
+  },
+  "dependencies": {
+    "terser": "^5.33.0"
+  }
+}

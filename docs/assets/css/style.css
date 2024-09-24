@@ -1,0 +1,264 @@
+:root {
+    --color-black: #000;
+    --color-gray: #C0C0C0;
+    --color-gray-light: #D3D3D3;
+    --color-carbon: #2b2d36;
+    --color-carbon-light: #3b3d46;
+    --color-blue: #0078D7;
+    --color-blue-dark: #002080;
+    --color-blue-light: #A4C8E1;
+    --color-red: #B22222;
+    --color-white: #fff;
+
+    --font-family-fixedsys: 'Fixedsys', 'Courier New', Courier, monospace;
+    --font-family-jersey-15-charted: "Jersey 15 Charted", sans-serif;
+    --font-family-ms-sans-serif: 'MS Sans Serif', sans-serif;
+    --font-family-vt323: "VT323", monospace;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--color-carbon);
+    font-family: var(--font-family-ms-sans-serif);
+    color: var(--color-white);
+    position: relative;
+}
+
+a {
+    color: var(--color-white);
+    text-decoration: underline;
+}
+
+a:hover {
+    color: var(--color-blue);
+}
+
+header {
+    padding: 4em 0 2em 0;
+    text-align: center;
+}
+
+header #title {
+    font-family: var(--font-family-jersey-15-charted);
+    font-size: 2.8em;
+    color: var(--color-white);
+}
+
+#intro {
+    padding: 1.2em 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#intro #intro_inner {
+    margin: 0 auto;
+    width: 60%;
+    max-width: 1024px;
+    text-align: center;
+}
+
+#intro #intro_inner p {
+    line-height: 1.4em;
+    font-size: 1.1em;
+}
+
+#content {
+    margin: 2em;
+}
+
+#content .convert {
+    padding: 1em 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#content .convert_inner {
+    width: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#content .gen {
+    margin: 0 auto;
+    max-width: 1024px;
+    border: 2px solid var(--color-white);
+}
+
+#content .gen .options {
+    background-color: var(--color-carbon-light);
+    border-bottom: 2px solid var(--color-white);
+    padding: 0.8em 1em;
+}
+
+#content .gen .options .options_inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#content .gen .options .options_inner .selects {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.4em;
+}
+
+#content .gen .options .options_inner .selects select {
+    background-color: var(--color-carbon);
+    border: 2px solid var(--color-white);
+    color: var(--color-white);
+    outline: none;
+    padding: 0.6em 0.2em;
+    font-family: var(--font-family-ms-sans-serif);
+    font-size: 0.85em;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#content .gen .options .options_inner .selects select option {
+    border-radius: 0;
+}
+
+#content .gen .options .options_inner .links {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+}
+
+#content .gen .payload {
+    padding: 1em 0;
+    background-color: var(--color-black);
+}
+
+#content .gen .payload pre {
+    position: relative;
+}
+
+#content .gen .payload pre .labels {
+    position: absolute;
+    top: 0;
+    left: 2em;
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+}
+
+#content .gen .payload pre .labels .label {
+    padding: 0.4em;
+    font-size: 0.95em;
+    color: var(--color-white);
+}
+
+#content .gen .payload pre .labels .label.admin {
+    background-color: var(--color-red);
+    display: none;
+}
+
+#content .gen .payload pre .labels .label.cli {
+    background-color: var(--color-blue);
+    display: none;
+}
+
+#content .gen .payload pre .copy {
+    position: absolute;
+    top: 0;
+    right: 1em;
+    width: 1.8em;
+    height: 1.8em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-white);
+    cursor: pointer;
+}
+
+#content .gen .payload pre code {
+    display: block;
+    background-color: transparent;
+    padding: 0 2em;
+    font-family: var(--font-family-fixedsys);
+    font-size: 1em;
+    text-wrap: wrap;
+    line-height: 1.6em;
+    color: var(--color-white);
+}
+
+#content .gen .payload pre code:focus {
+    border :none;
+    outline: none;
+}
+
+#content .gen .desc {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    background-color: var(--color-carbon);
+    padding: 0.6em 1.4em;
+}
+
+#content .gen .desc .icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#content .gen .desc svg {
+    width: 22px;
+    height: 22px;
+}
+
+#content .gen .desc p {
+    color: var(--color-gray);
+    word-wrap: break-word;
+    line-height: 1.6em;
+}
+
+#content .gen #convert #convert_inner {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6em;
+}
+
+#copied-popup {
+    position: fixed;
+    bottom: 1em;
+    right: 1em;
+    display: none;
+    background-color: var(--color-blue);
+    border: 2px solid var(--color-white);
+    padding: 0.1em 0.4em;
+}
+
+@media (max-width: 768px) {
+    #desc {
+        margin: 0 0.8em;
+    }
+
+    #desc #desc_inner {
+        width: 100%;
+    }
+
+    #content {
+        margin: 0.8em;
+    }
+
+    #content .gen .options .options_inner .selects {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #content .gen .options .options_inner .links {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+}
