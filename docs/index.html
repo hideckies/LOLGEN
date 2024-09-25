@@ -47,19 +47,25 @@
                     <div class="options_inner">
                         <div id="options_1_selects" class="selects">
                             <select id="options_1_purpose" onchange="updatePurpose()">
+                                <option value="Archive">Archive</option>
                                 <option value="Copy">Copy</option>
                                 <option value="Delete Backups">Delete Backups</option>
                                 <option value="Delete Shadow Copies">Delete Shadow Copies</option>
+                                <option value="Disable Command Logging">Disable Command Logging</option>
+                                <option value="Disable Event Logging">Disable Event Logging</option>
                                 <option value="Download">Download</option>
                                 <option value="Download & Execute" selected>Download & Execute</option>
                                 <option value="Dump Credentials">Dump Credentials</option>
+                                <option value="Enumerate">Enumerate</option>
                                 <option value="Execute">Execute</option>
                                 <option value="Execute DLL">Execute DLL</option>
                                 <option value="Execute EXE">Execute EXE</option>
                                 <option value="Execute Hidden Files">Execute Hidden Files</option>
                                 <option value="Hide Files">Hide Files</option>
                                 <option value="Persistence">Persistence</option>
+                                <option value="UAC Bypass">UAC Bypass</option>
                             </select>
+                            <span>with</span>
                             <select id="options_1_bin" onchange="update1()">
                             </select>
                         </div>

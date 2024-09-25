@@ -16,6 +16,11 @@
     --font-family-vt323: "VT323", monospace;
 }
 
+* {
+    scrollbar-color: var(--color-white) transparent;
+    scrollbar-width: thin;
+}
+
 html, body {
     margin: 0;
     padding: 0;
