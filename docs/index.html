@@ -6,17 +6,12 @@
         <title>LOLGEN: Living Off The Land Payload Generator</title>
         <link rel="icon" href="assets/img/favicon.png">
         <link rel="stylesheet" href="assets/css/style.css?v=0.0.0" type="text/css">
-
-        <!-- Highlight -->
-        <!-- <link rel="stylesheet" href="assets/css/windows-nt.min.css"> -->
-        <!-- <script src="assets/js/highlight.min.js"></script> -->
+        <!-- HTMX -->
         <script src="https://unpkg.com/htmx.org@2.0.2" integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" crossorigin="anonymous"></script>
-    
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Jersey+15+Charted&family=VT323&display=swap" rel="stylesheet">
-
         <!-- Cloudflare Web Analytics -->
         <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "728fd5d5861e499cb1237ce90c8506c7"}'></script>
     </head>
@@ -58,13 +53,18 @@
                                 <option value="Download & Execute" selected>Download & Execute</option>
                                 <option value="Dump Credentials">Dump Credentials</option>
                                 <option value="Enumerate">Enumerate</option>
-                                <option value="Execute">Execute</option>
+                                <option value="Evade Debuggers">Evade Debuggers</option>
+                                <option value="Evade VMs/Sandboxes">Evade VMs/Sandboxes</option>
                                 <option value="Execute ADS">Execute ADS</option>
+                                <option value="Execute Command/Code">Execute Command/Code</option>
                                 <option value="Execute DLL">Execute DLL</option>
                                 <option value="Execute EXE">Execute EXE</option>
                                 <option value="Exfiltrate">Exfiltrate</option>
                                 <option value="Manipulate Accounts">Manipulate Accounts</option>
+                                <option value="Masquerade">Masquerade</option>
+                                <option value="Modify Code Signing Policy">Modify Code Signing Policy</option>
                                 <option value="Modify Permissions">Modify Permissions</option>
+                                <option value="Obfuscate">Obfuscate</option>
                                 <option value="Persistence">Persistence</option>
                                 <option value="Reveal ADS">Reveal ADS</option>
                                 <option value="Sniff Network">Sniff Network</option>
@@ -93,7 +93,7 @@
                     <pre id="payload_1_pre">
                         <div id="payload_1_pre_labels" class="labels">
                             <span id="payload_1_pre_labels_admin" class="label admin">Run as Administrator</span>
-                            <span id="payload_1_pre_labels_cli" class="label cli">PowerShell</span>
+                            <span id="payload_1_pre_labels_cli" class="label cli">Run on PowerShell</span>
                         </div>
                         <div id="payload_1_pre_copy" class="copy" onclick="copy1()">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
@@ -122,17 +122,17 @@
                 <div id="options_2" class="options">
                     <div class="options_inner">
                         <div id="options_2_selects" class="selects">
+                            <span>Obfuscate with</span>
                             <select id="options_2_obfs" onchange="update2()">
+                                <option value="AES-CBC">AES-CBC</option>
+                                <option value="AES-GCM">AES-GCM</option>
                                 <option value="Base64" selected>Base64</option>
                                 <option value="Split">Split</option>
                             </select>
                         </div>
-                        <div id="options_2_links" class="links">
-                            <!-- <a href="" target="_blank" rel="noopener noreferrer" id="options_2_links_mitre" class="link"></a> -->
-                        </div>
                     </div>
-                </div> 
-    
+                </div>
+
                 <div id="payload_2" class="payload">
                     <pre id="payload_2_pre">
                         <div id="payload_2_pre_labels" class="labels">

