@@ -238,6 +238,19 @@ header #title {
     gap: 0.6em;
 }
 
+#content #refs {
+    margin: 4em auto;
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#content #refs #refs_links {
+    display: flex;
+    gap: 0.6em;
+}
+
 #copied-popup {
     position: fixed;
     bottom: 1em;
@@ -269,5 +282,9 @@ header #title {
     #content .gen .options .options_inner .links {
         flex-direction: column;
         align-items: flex-end;
+    }
+
+    #content #refs {
+        width: 100%;
     }
 }

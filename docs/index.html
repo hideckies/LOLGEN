@@ -23,10 +23,7 @@
         <div id="intro">
             <div id="intro_inner">
                 <p>
-                    LOLGEN is inspired by
-                    <a href="https://attack.mitre.org/" target="_blank" rel="noopener noreferrer">MITRE ATT&CK</a>
-                    and
-                    <a href="https://lolbas-project.github.io/" target="_blank" rel="noopener noreferrer">LOLBAS</a>.
+                    LOLGEN is inspired by MITRE ATT&CK and LOLBAS.
                     The source code is <a href="https://github.com/hideckies/LOLGEN" target="_blank" rel="noopener noreferrer">HERE</a>.
                 </p>
                 <p>
@@ -44,12 +41,14 @@
                             <select id="options_1_purpose" onchange="updatePurpose()">
                                 <option value="Alternate Data Streams">Alternate Data Streams</option>
                                 <option value="Archive">Archive</option>
+                                <option value="Bypass MOTW">Bypass MOTW</option>
                                 <option value="Clear Event Logs">Clear Event Logs</option>
                                 <option value="Copy">Copy</option>
-                                <option value="Delete Backups">Delete Backups</option>
-                                <option value="Delete Shadow Copies">Delete Shadow Copies</option>
+                                <option value="Delete Backups & Shadow Copies">Delete Backups & Shadow Copies</option>
+                                <option value="Disable AV/EDR">Disable AV/EDR</option>
                                 <option value="Disable Command Logging">Disable Command Logging</option>
                                 <option value="Disable Event Logging">Disable Event Logging</option>
+                                <option value="Disable Firewall">Disable Firewall</option>
                                 <option value="Download">Download</option>
                                 <option value="Download & Execute" selected>Download & Execute</option>
                                 <option value="Dump Credentials">Dump Credentials</option>
@@ -68,15 +67,18 @@
                                 <option value="Execute EXE">Execute EXE</option>
                                 <option value="Execute JavaScript">Execute JavaScript</option>
                                 <option value="Exfiltrate">Exfiltrate</option>
+                                <option value="Hide Files">Hide Files</option>
+                                <option value="Install Drivers">Install Drivers</option>
                                 <option value="Manipulate Accounts">Manipulate Accounts</option>
                                 <option value="Masquerade">Masquerade</option>
                                 <option value="Modify Code Signing Policy">Modify Code Signing Policy</option>
-                                <option value="Modify Permissions">Modify Permissions</option>
+                                <option value="Modify File Permissions">Modify File Permissions</option>
                                 <option value="Obfuscate">Obfuscate</option>
                                 <option value="Persistence">Persistence</option>
                                 <option value="Reveal ADS">Reveal ADS</option>
                                 <option value="Sniff Network">Sniff Network</option>
                                 <option value="Steal Cookies">Steal Cookies</option>
+                                <option value="Timestomp">Timestomp</option>
                                 <option value="UAC Bypass">UAC Bypass</option>
                             </select>
                             <span>using</span>
@@ -167,6 +169,15 @@
                             contenteditable="true"
                             spellcheck="false"></code>
                     </pre>
+                </div>
+            </div>
+
+            <div id="refs">
+                <h2>References</h2>
+                <div id="refs_links">
+                    <a href="https://attack.mitre.org/" target="_blank" rel="noopener noreferrer">MITRE ATT&CK</a>
+                    <a href="https://lolbas-project.github.io/" target="_blank" rel="noopener noreferrer">LOLBAS</a>
+                    <a href="https://atomicredteam.io/" target="_blank" rel="noopener noreferrer">Atomic Red Team</a>
                 </div>
             </div>
         </div>
