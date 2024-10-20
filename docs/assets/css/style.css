@@ -284,6 +284,10 @@ header #title {
         align-items: flex-end;
     }
 
+    #content .gen .options #options_1_links {
+        display: none;
+    }
+
     #content #refs {
         width: 100%;
     }
