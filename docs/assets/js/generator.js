@@ -106,11 +106,27 @@ function obfsBase64(payload, cli) {
 }
 
 function obfsBase64Python(payload, cli) {
-    if (cli == 'Command Prompt') {
+    if (cli === 'Command Prompt') {
         return `# No available on Command Prompt`;
     } else {
         return `iex $(python3 -c "import base64;print(base64.b64decode('${toBase64(payload)}').decode())")`;
     }
+}
+
+function obfsDoubleQuotes(payload, cli) {
+    const arr = payload.split(' ');
+    const cmdArr = arr[0].split('');
+
+    const min = 2;
+    let randNum = Math.floor(Math.random() * ((cmdArr.length - min) / 2 + 1)) * 2 + min;
+    randNum = randNum % 2 === 0 ? randNum : randNum + 1;
+
+    for (i = 0; i < 2; i++) {
+        const maxIdx = cmdArr.length;
+        const randEvenIdx = Math.floor(Math.random() * (maxIdx / 2)) * 2 + 1;
+        cmdArr.splice(randEvenIdx, 0, '"');
+    }
+    return `${cmdArr.join('')} ${arr.slice(1).join(' ')}`
 }
 
 function obfsMultibyte(payload, cli) {
@@ -169,6 +185,8 @@ async function obfs(payload, cli, optObfs) {
             return obfsBase64(payload, cli);
         case 'Base64 (Python)':
             return obfsBase64Python(payload, cli);
+        case 'Double-Quotes':
+            return obfsDoubleQuotes(payload, cli);
         case 'Multibyte':
             return obfsMultibyte(payload, cli);
         case 'Reverse':
