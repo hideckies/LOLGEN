@@ -145,6 +145,12 @@ function obfsMultibyte(payload, cli) {
     }
 }
 
+function obfsRandomCase(payload, cli) {
+    return payload.split('').map(char => {
+        return Math.random() < 0.5 ? char.toLowerCase() : char.toUpperCase();
+    }).join('');
+}
+
 function obfsReverse(payload, cli) {
     if (cli === 'Command Prompt') {
         return '# No available on Command Prompt';
@@ -189,6 +195,8 @@ async function obfs(payload, cli, optObfs) {
             return obfsDoubleQuotes(payload, cli);
         case 'Multibyte':
             return obfsMultibyte(payload, cli);
+        case 'Random Case':
+            return obfsRandomCase(payload, cli);
         case 'Reverse':
             return obfsReverse(payload, cli);
         case 'Split':

