@@ -547,11 +547,19 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command enumerates successful logon events.',
         },
+        'PsLogList': {
+            'cmd': 'psloglist',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1654', 'url': 'https://attack.mitre.org/techniques/T1654/'},
+            'lolbas': null,
+            'desc': 'The command enumerates all event logs.',
+        },
         'Wevtutil': {
             'cmd': 'wevtutil qe Security "/q:*[System[(EventID=4624)]]" /f:text /c:10',
             'cli': null,
             'adminRequired': true,
-            'mitre': {'id': '', 'url': ''},
+            'mitre': {'id': 'T1654', 'url': 'https://attack.mitre.org/techniques/T1654/'},
             'lolbas': null,
             'desc': 'The command enumerates successful logon events.'
         },
@@ -719,6 +727,14 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command enumerates running processes.',
         },
+        'PsList': {
+            'cmd': 'pslist -t',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1057', 'url': 'https://attack.mitre.org/techniques/T1057/'},
+            'lolbas': null,
+            'desc': 'The command enumerates running processes. The \'-t\' option shows process tree.',
+        },
         'Tasklist': {
             'cmd': 'tasklist',
             'cli': null,
@@ -753,7 +769,7 @@ const PAYLOADS = {
             'lolbas': null,
             'desc': 'The command enumerates running services.',
         },
-        'Psservice': {
+        'PsService': {
             'cmd': 'psservice query -s active',
             'cli': null,
             'adminRequired': false,
@@ -882,6 +898,14 @@ const PAYLOADS = {
             'mitre': {'id': 'T1082', 'url': 'https://attack.mitre.org/techniques/T1082/'},
             'lolbas': null,
             'desc': 'The command displays the system language.',
+        },
+        'PsInfo': {
+            'cmd': 'psinfo',
+            'cli': null,
+            'adminRequired': false,
+            'mitre': {'id': 'T1082', 'url': 'https://attack.mitre.org/techniques/T1082/'},
+            'lolbas': null,
+            'desc': 'The command shows information for the local system.',
         },
         'Set': {
             'cmd': 'cmd /c set',
